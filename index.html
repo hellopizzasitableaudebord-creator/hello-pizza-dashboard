@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H-Pizza - Tableau de Bord</title>
+    <title>Hello Pizza - Tableau de Bord</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -49,7 +49,6 @@
     <!-- ================= CONNEXION ================= -->
     <div id="login-screen" class="flex items-center justify-center h-screen relative">
         
-        <!-- Boutons Thème & Langue (Haut Droite) -->
         <div class="absolute top-6 right-6 flex gap-3 items-center">
             <div class="flex gap-1 bg-gray-200 dark:bg-gray-800 p-1 rounded">
                 <button class="lang-btn active" onclick="changeLang('fr')">FR</button>
@@ -60,36 +59,36 @@
         </div>
 
         <div class="card w-full max-w-md p-8 shadow-2xl">
-            <h1 class="text-3xl font-bold text-emerald-500 mb-2 text-center" data-i18n="app_title">H-Pizza Pilotage</h1>
-            <p class="text-muted mb-6 text-center text-sm" data-i18n="app_subtitle">Système d'Information & Tableau de Bord</p>
+            <h1 class="text-3xl font-bold text-emerald-500 mb-2 text-center" data-i18n="app_title"></h1>
+            <p class="text-muted mb-6 text-center text-sm" data-i18n="app_subtitle"></p>
             
             <div class="flex justify-center mb-6 border-b border-gray-300 dark:border-gray-700">
-                <div id="tab-login" class="cursor-pointer px-4 py-2 border-b-2 border-emerald-500 text-emerald-500 font-bold" onclick="switchAuth('login')" data-i18n="tab_login">Connexion</div>
-                <div id="tab-signup" class="cursor-pointer px-4 py-2 text-muted" onclick="switchAuth('signup')" data-i18n="tab_signup">Inscription</div>
+                <div id="tab-login" class="cursor-pointer px-4 py-2 border-b-2 border-emerald-500 text-emerald-500 font-bold" onclick="switchAuth('login')" data-i18n="tab_login"></div>
+                <div id="tab-signup" class="cursor-pointer px-4 py-2 text-muted" onclick="switchAuth('signup')" data-i18n="tab_signup"></div>
             </div>
 
             <form id="form-login" onsubmit="event.preventDefault(); login();">
-                <input type="text" id="login-email" name="email" autocomplete="username" placeholder="Email (ou admin)" class="w-full p-3 mb-3 rounded input-field focus:outline-none focus:border-emerald-500" data-i18n-placeholder="ph_email">
+                <input type="text" id="login-email" name="email" autocomplete="username" class="w-full p-3 mb-3 rounded input-field focus:outline-none focus:border-emerald-500" data-i18n-placeholder="ph_email">
                 <div class="relative mb-3">
-                    <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mot de passe" class="w-full p-3 pr-10 rounded input-field focus:outline-none focus:border-emerald-500" data-i18n-placeholder="ph_password">
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" class="w-full p-3 pr-10 rounded input-field focus:outline-none focus:border-emerald-500" data-i18n-placeholder="ph_password">
                     <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none" title="Afficher/Masquer">👁️</button>
                 </div>
                 <div class="flex items-center mb-4">
                     <input type="checkbox" id="remember-me" class="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                    <label for="remember-me" class="ml-2 text-sm font-medium text-muted" data-i18n="remember_me">Se souvenir de moi</label>
+                    <label for="remember-me" class="ml-2 text-sm font-medium text-muted" data-i18n="remember_me"></label>
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded transition" data-i18n="btn_login">Se connecter</button>
-                <p id="error-msg" class="text-red-500 text-sm mt-3 text-center hidden font-bold" data-i18n="error_login">Identifiants incorrects.</p>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded transition" data-i18n="btn_login"></button>
+                <p id="error-msg" class="text-red-500 text-sm mt-3 text-center hidden font-bold" data-i18n="error_login"></p>
             </form>
 
             <form id="form-signup" class="hidden" onsubmit="event.preventDefault(); register();">
-                <input type="text" id="reg-name" name="name" autocomplete="name" placeholder="Nom complet" class="w-full p-3 mb-3 rounded input-field" data-i18n-placeholder="ph_name">
-                <input type="email" id="reg-email" name="email" autocomplete="email" placeholder="Email" class="w-full p-3 mb-3 rounded input-field" data-i18n-placeholder="ph_email">
+                <input type="text" id="reg-name" name="name" autocomplete="name" class="w-full p-3 mb-3 rounded input-field" data-i18n-placeholder="ph_name">
+                <input type="email" id="reg-email" name="email" autocomplete="email" class="w-full p-3 mb-3 rounded input-field" data-i18n-placeholder="ph_email">
                 <div class="relative mb-4">
-                    <input type="password" id="reg-password" name="new-password" autocomplete="new-password" placeholder="Mot de passe" class="w-full p-3 pr-10 rounded input-field" data-i18n-placeholder="ph_password">
+                    <input type="password" id="reg-password" name="new-password" autocomplete="new-password" class="w-full p-3 pr-10 rounded input-field" data-i18n-placeholder="ph_password">
                     <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none">👁️</button>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition" data-i18n="btn_signup">S'inscrire</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition" data-i18n="btn_signup"></button>
             </form>
         </div>
     </div>
@@ -98,12 +97,11 @@
     <div id="dashboard-screen" class="hidden max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-gray-300 dark:border-gray-700 pb-4 gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-emerald-500" data-i18n="dash_title">Hello Pizza — Tableau de Bord</h1>
-                <p class="text-sm text-muted"><span data-i18n="connected_as">Connecté</span> : <span id="user-display" class="font-bold"></span> | M0 = Sept. 2026</p>
+                <h1 class="text-2xl font-bold text-emerald-500" data-i18n="dash_title"></h1>
+                <p class="text-sm text-muted"><span data-i18n="connected_as"></span> : <span id="user-display" class="font-bold"></span> | M0 = Sept. 2026</p>
             </div>
             <div class="flex flex-wrap gap-2 items-center">
                 
-                <!-- Langue -->
                 <div class="flex gap-1 bg-gray-200 dark:bg-gray-800 p-1 rounded">
                     <button class="lang-btn active" onclick="changeLang('fr')">FR</button>
                     <button class="lang-btn" onclick="changeLang('en')">EN</button>
@@ -112,22 +110,22 @@
 
                 <button onclick="toggleTheme()" class="p-2 rounded bg-gray-200 dark:bg-gray-800 text-xl border border-gray-300 dark:border-gray-600" title="Thème">🌓</button>
                 
-                <button onclick="exportData('xlsx')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_export">📤 Exporter Excel</button>
+                <button onclick="exportData('xlsx')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_export"></button>
                 <button onclick="syncData()" id="sync-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2 transition">
-                    <span id="sync-icon">🔄</span> <span id="sync-text" data-i18n="btn_sync">Synchroniser</span>
+                    <span id="sync-icon">🔄</span> <span id="sync-text" data-i18n="btn_sync"></span>
                 </button>
-                <button onclick="openTargetModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_targets">⚙️ Cibles</button>
-                <button onclick="openHistoryModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_history">📜 Historique</button>
-                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm" data-i18n="btn_logout">Quitter</button>
+                <button onclick="openTargetModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_targets"></button>
+                <button onclick="openHistoryModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_history"></button>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm" data-i18n="btn_logout"></button>
             </div>
         </header>
 
         <div class="flex flex-wrap gap-2 mb-6">
-            <button onclick="switchTab('gerant')" id="tab-gerant" class="px-4 py-2 rounded font-semibold tab-active transition" data-i18n="tab_manager">Synthèse Gérant</button>
-            <button onclick="switchTab('ventes')" id="tab-ventes" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_sales">Ventes</button>
-            <button onclick="switchTab('achat')" id="tab-achat" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_purchases">Achat</button>
-            <button onclick="switchTab('prepa')" id="tab-prepa" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_prep">Préparation</button>
-            <button onclick="switchTab('service')" id="tab-service" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_service">Service</button>
+            <button onclick="switchTab('gerant')" id="tab-gerant" class="px-4 py-2 rounded font-semibold tab-active transition" data-i18n="tab_manager"></button>
+            <button onclick="switchTab('ventes')" id="tab-ventes" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_sales"></button>
+            <button onclick="switchTab('achat')" id="tab-achat" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_purchases"></button>
+            <button onclick="switchTab('prepa')" id="tab-prepa" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_prep"></button>
+            <button onclick="switchTab('service')" id="tab-service" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_service"></button>
         </div>
 
         <div id="content-gerant" class="process-content space-y-6"></div>
@@ -140,35 +138,35 @@
     <!-- MODAL CIBLES -->
     <div id="target-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
         <div class="card w-full max-w-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-xl font-bold text-amber-500 mb-4" data-i18n="modal_targets_title">⚙️ Ajuster les Objectifs</h2>
+            <h2 class="text-xl font-bold text-amber-500 mb-4" data-i18n="modal_targets_title"></h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-gray-100 dark:bg-gray-800 p-3 rounded">
                 <div>
-                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_process">Processus</label>
+                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_process"></label>
                     <select id="edit-process" class="w-full p-2 rounded border input-field font-bold" onchange="updateModalInputs()">
-                        <option value="tous" data-i18n="opt_all">Tous</option>
-                        <option value="ventes" data-i18n="tab_sales">Ventes</option>
-                        <option value="achat" data-i18n="tab_purchases">Achat</option>
-                        <option value="prepa" data-i18n="tab_prep">Préparation</option>
-                        <option value="service" data-i18n="tab_service">Service</option>
+                        <option value="tous" data-i18n="opt_all"></option>
+                        <option value="ventes" data-i18n="tab_sales"></option>
+                        <option value="achat" data-i18n="tab_purchases"></option>
+                        <option value="prepa" data-i18n="tab_prep"></option>
+                        <option value="service" data-i18n="tab_service"></option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_month">Mois</label>
+                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_month"></label>
                     <select id="edit-month" class="w-full p-2 rounded border input-field font-bold" onchange="updateModalInputs()"></select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_category">Catégorie</label>
+                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_category"></label>
                     <div class="flex gap-1">
-                        <button class="filter-btn active flex-1" data-filter="all" onclick="setModalFilter('all')" data-i18n="opt_all">Tous</button>
-                        <button class="filter-btn flex-1" data-filter="major" onclick="setModalFilter('major')" data-i18n="opt_major">Majeurs</button>
-                        <button class="filter-btn flex-1" data-filter="sub" onclick="setModalFilter('sub')" data-i18n="opt_sub">Sous-obj.</button>
+                        <button class="filter-btn active flex-1" data-filter="all" onclick="setModalFilter('all')" data-i18n="opt_all"></button>
+                        <button class="filter-btn flex-1" data-filter="major" onclick="setModalFilter('major')" data-i18n="opt_major"></button>
+                        <button class="filter-btn flex-1" data-filter="sub" onclick="setModalFilter('sub')" data-i18n="opt_sub"></button>
                     </div>
                 </div>
             </div>
             <div id="target-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
             <div class="flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
-                <button onclick="closeTargetModal()" class="px-4 py-2 text-muted font-bold hover:text-red-500" data-i18n="btn_cancel">Annuler</button>
-                <button onclick="saveTargets()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded font-bold" data-i18n="btn_save">Enregistrer</button>
+                <button onclick="closeTargetModal()" class="px-4 py-2 text-muted font-bold hover:text-red-500" data-i18n="btn_cancel"></button>
+                <button onclick="saveTargets()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded font-bold" data-i18n="btn_save"></button>
             </div>
         </div>
     </div>
@@ -177,8 +175,8 @@
     <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
         <div class="card w-full max-w-3xl p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
             <div class="flex justify-between items-center mb-4 border-b border-gray-300 dark:border-gray-700 pb-2">
-                <h2 class="text-xl font-bold" data-i18n="modal_history_title">📜 Historique des modifications</h2>
-                <button onclick="closeHistoryModal()" class="text-red-500 hover:text-red-700 font-bold bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded" data-i18n="btn_close">Fermer</button>
+                <h2 class="text-xl font-bold" data-i18n="modal_history_title"></h2>
+                <button onclick="closeHistoryModal()" class="text-red-500 hover:text-red-700 font-bold bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded" data-i18n="btn_close"></button>
             </div>
             <div id="history-content" class="space-y-4"></div>
         </div>
@@ -186,10 +184,10 @@
 
     <!-- ================= JAVASCRIPT ================= -->
     <script>
-        // --- DICTIONNAIRE DE TRADUCTION ---
+        // --- DICTIONNAIRE COMPLET (FR, EN, AR) ---
         const i18n = {
             fr: {
-                app_title: "H-Pizza Pilotage", app_subtitle: "Système d'Information & Tableau de Bord",
+                app_title: "Hello Pizza Pilotage", app_subtitle: "Système d'Information & Tableau de Bord",
                 tab_login: "Connexion", tab_signup: "Inscription", ph_email: "Email (ou admin)", ph_password: "Mot de passe", ph_name: "Nom complet",
                 remember_me: "Se souvenir de moi", btn_login: "Se connecter", error_login: "Identifiants incorrects.", btn_signup: "S'inscrire",
                 dash_title: "Hello Pizza — Tableau de Bord", connected_as: "Connecté", btn_export: "📤 Exporter Excel", btn_sync: "Synchroniser",
@@ -197,11 +195,25 @@
                 tab_manager: "Synthèse Gérant", tab_sales: "Ventes", tab_purchases: "Achat", tab_prep: "Préparation", tab_service: "Service",
                 modal_targets_title: "⚙️ Ajuster les Objectifs", lbl_process: "Processus", opt_all: "Tous", lbl_month: "Mois", lbl_category: "Catégorie",
                 opt_major: "Majeurs", opt_sub: "Sous-obj.", btn_cancel: "Annuler", btn_save: "Enregistrer", modal_history_title: "📜 Historique des modifications", btn_close: "Fermer",
-                // Chart labels
-                chart_month: "Mois", chart_monthly_val: "Valeur mensuelle", chart_cumul: "Cumul", chart_avg_cumul: "Moyenne cumulée", chart_target: "Cible mensuelle", chart_actual: "Réalisé"
+                chart_month: "Mois", chart_monthly_val: "Valeur mensuelle", chart_cumul: "Cumul", chart_avg_cumul: "Moyenne cumulée", chart_target: "Cible mensuelle", chart_actual: "Réalisé",
+                target_m12: "Cible M12", actual_m1: "M1 (Réalisé)",
+                
+                v_ca_title: "Chiffre d'Affaires Mensuel", v_ca_formula: "(CA année en cours - CA année de référence)",
+                v_cmd_title: "Nombre de Commandes", v_cmd_formula: "Nb commandes mois m - Nb commandes mois référence",
+                v_ticket_title: "Ticket Moyen", v_ticket_formula: "Ticket moyen du mois actuel - Ticket moyen de référence",
+                a_rupt_nc_title: "Rupture MP Non Critiques", a_rupt_nc_formula: "(Nb MP non critiques en rupture / Total MP non critiques) × 100",
+                a_rupt_c_title: "Rupture MP Critiques", a_rupt_c_formula: "(Nb MP critiques en rupture / Total MP critiques) × 100",
+                a_stock_title: "MP Respectant Stock Min", a_stock_formula: "(Nb MP respectant le stock min / Total MP) × 100",
+                p_temps_title: "Temps Moyen de Préparation", p_temps_formula: "Somme des temps de préparation / Nombre total de plats préparés",
+                p_retard_title: "Taux de Commandes en Retard", p_retard_formula: "(Nb commandes dépassant le délai / Total commandes) × 100",
+                s_retours_title: "Nombre de Retours Clients", s_retours_formula: "Nombre de réponses Google Forms",
+                s_reclam_title: "Taux de Réclamation", s_reclam_formula: "(Nb réclamations / Total plats servis) × 100",
+                s_indice_title: "Indice Global Expérience Client", s_indice_formula: "Moyenne pondérée des scores",
+                ticket_cumul: "Ticket moyen cumulé",
+                no_history: "Aucune modification enregistrée.", by: "par"
             },
             en: {
-                app_title: "H-Pizza Dashboard", app_subtitle: "Information System & Dashboard",
+                app_title: "Hello Pizza Dashboard", app_subtitle: "Information System & Dashboard",
                 tab_login: "Login", tab_signup: "Sign Up", ph_email: "Email (or admin)", ph_password: "Password", ph_name: "Full Name",
                 remember_me: "Remember me", btn_login: "Log In", error_login: "Invalid credentials.", btn_signup: "Sign Up",
                 dash_title: "Hello Pizza — Dashboard", connected_as: "Connected", btn_export: "📤 Export Excel", btn_sync: "Synchronize",
@@ -209,20 +221,48 @@
                 tab_manager: "Manager Summary", tab_sales: "Sales", tab_purchases: "Purchases", tab_prep: "Preparation", tab_service: "Service",
                 modal_targets_title: "⚙️ Adjust Targets", lbl_process: "Process", opt_all: "All", lbl_month: "Month", lbl_category: "Category",
                 opt_major: "Major", opt_sub: "Sub-obj.", btn_cancel: "Cancel", btn_save: "Save", modal_history_title: "📜 Modification History", btn_close: "Close",
-                // Chart labels
-                chart_month: "Month", chart_monthly_val: "Monthly Value", chart_cumul: "Cumul", chart_avg_cumul: "Cumul Avg", chart_target: "Monthly Target", chart_actual: "Actual"
+                chart_month: "Month", chart_monthly_val: "Monthly Value", chart_cumul: "Cumul", chart_avg_cumul: "Cumul Avg", chart_target: "Monthly Target", chart_actual: "Actual",
+                target_m12: "Target M12", actual_m1: "M1 (Actual)",
+                
+                v_ca_title: "Monthly Revenue", v_ca_formula: "(Current year revenue - Baseline year revenue)",
+                v_cmd_title: "Number of Orders", v_cmd_formula: "Orders month m - Baseline orders",
+                v_ticket_title: "Average Ticket", v_ticket_formula: "Current month ticket - Baseline ticket",
+                a_rupt_nc_title: "Non-Critical RM Stockout", a_rupt_nc_formula: "(Non-critical RM out of stock / Total non-critical RM) × 100",
+                a_rupt_c_title: "Critical RM Stockout", a_rupt_c_formula: "(Critical RM out of stock / Total critical RM) × 100",
+                a_stock_title: "RM Meeting Min Stock", a_stock_formula: "(RM meeting min stock / Total RM) × 100",
+                p_temps_title: "Average Prep Time", p_temps_formula: "Sum of prep times / Total dishes prepared",
+                p_retard_title: "Late Orders Rate", p_retard_formula: "(Orders exceeding time limit / Total orders) × 100",
+                s_retours_title: "Customer Feedback", s_retours_formula: "Number of Google Forms responses",
+                s_reclam_title: "Complaint Rate", s_reclam_formula: "(Complaints / Total dishes served) × 100",
+                s_indice_title: "Global CX Index", s_indice_formula: "Weighted average of scores",
+                ticket_cumul: "Cumul average ticket",
+                no_history: "No modifications recorded.", by: "by"
             },
             ar: {
-                app_title: "إدارة بيتزا", app_subtitle: "نظام المعلومات ولوحة القيادة",
+                app_title: "لوحة تحكم Hello Pizza", app_subtitle: "نظام المعلومات ولوحة القيادة",
                 tab_login: "تسجيل الدخول", tab_signup: "إنشاء حساب", ph_email: "البريد (أو admin)", ph_password: "كلمة المرور", ph_name: "الاسم الكامل",
                 remember_me: "تذكرني", btn_login: "دخول", error_login: "بيانات غير صحيحة.", btn_signup: "تسجيل",
-                dash_title: "بيتزا — لوحة القيادة", connected_as: "متصل", btn_export: "📤 تصدير إكسيل", btn_sync: "مزامنة",
+                dash_title: "Hello Pizza — لوحة القيادة", connected_as: "متصل", btn_export: "📤 تصدير إكسيل", btn_sync: "مزامنة",
                 btn_targets: "⚙️ الأهداف", btn_history: "📜 السجل", btn_logout: "خروج",
                 tab_manager: "ملخص المدير", tab_sales: "المبيعات", tab_purchases: "المشتريات", tab_prep: "التحضير", tab_service: "الخدمة",
                 modal_targets_title: "⚙️ تعديل الأهداف", lbl_process: "العملية", opt_all: "الكل", lbl_month: "الشهر", lbl_category: "الفئة",
                 opt_major: "رئيسي", opt_sub: "فرعي", btn_cancel: "إلغاء", btn_save: "حفظ", modal_history_title: "📜 سجل التعديلات", btn_close: "إغلاق",
-                // Chart labels
-                chart_month: "شهر", chart_monthly_val: "القيمة الشهرية", chart_cumul: "تراكمي", chart_avg_cumul: "متوسط تراكمي", chart_target: "الهدف الشهري", chart_actual: "الفعلي"
+                chart_month: "شهر", chart_monthly_val: "القيمة الشهرية", chart_cumul: "تراكمي", chart_avg_cumul: "متوسط تراكمي", chart_target: "الهدف الشهري", chart_actual: "الفعلي",
+                target_m12: "الهدف M12", actual_m1: "M1 (الفعلي)",
+                
+                v_ca_title: "الإيرادات الشهرية", v_ca_formula: "(إيرادات السنة الحالية - إيرادات سنة الأساس)",
+                v_cmd_title: "عدد الطلبات", v_cmd_formula: "طلبات الشهر م - طلبات الأساس",
+                v_ticket_title: "متوسط الفاتورة", v_ticket_formula: "فاتورة الشهر الحالي - فاتورة الأساس",
+                a_rupt_nc_title: "نفاد المواد الخام غير الحرجة", a_rupt_nc_formula: "(المواد غير الحرجة المنتهية / إجمالي المواد غير الحرجة) × 100",
+                a_rupt_c_title: "نفاد المواد الخام الحرجة", a_rupt_c_formula: "(المواد الحرجة المنتهية / إجمالي المواد الحرجة) × 100",
+                a_stock_title: "المواد الخام المحققة للحد الأدنى", a_stock_formula: "(المواد المحققة للحد الأدنى / إجمالي المواد) × 100",
+                p_temps_title: "متوسط وقت التحضير", p_temps_formula: "مجموع أوقات التحضير / إجمالي الأطباق المحضرة",
+                p_retard_title: "معدل الطلبات المتأخرة", p_retard_formula: "(الطلبات المتأخرة / إجمالي الطلبات) × 100",
+                s_retours_title: "تعليقات العملاء", s_retours_formula: "عدد ردود نماذج جوجل",
+                s_reclam_title: "معدل الشكاوى", s_reclam_formula: "(الشكاوى / إجمالي الأطباق المقدمة) × 100",
+                s_indice_title: "مؤشر تجربة العميل الشامل", s_indice_formula: "متوسط مرجح للدرجات",
+                ticket_cumul: "متوسط الفاتورة التراكمي",
+                no_history: "لم يتم تسجيل أي تعديلات.", by: "بواسطة"
             }
         };
 
@@ -242,13 +282,11 @@
         function changeLang(lang) {
             currentLang = lang;
             
-            // Update buttons active state
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 if(btn.innerText.toLowerCase() === lang) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
 
-            // Gestion RTL pour l'arabe
             if (lang === 'ar') {
                 document.documentElement.setAttribute('dir', 'rtl');
                 document.documentElement.setAttribute('lang', 'ar');
@@ -259,7 +297,6 @@
 
             applyTranslations();
             
-            // Si on est sur le dashboard, on doit redessiner les graphiques pour mettre à jour les titres
             if (!document.getElementById('dashboard-screen').classList.contains('hidden')) {
                 renderAll();
             }
@@ -267,25 +304,26 @@
 
         function generateTargets(m0, m12) { let arr = [m0]; for(let i=1; i<=12; i++) arr.push(m0 + (m12 - m0) * (i / 12)); return arr; }
 
+        // --- DONNÉES SANS TITRE NI FORMULE (GÉRÉS PAR i18n) ---
         const appData = {
             ventes: [
-                { id: 'v_ca', title: 'Chiffre d\'Affaires Mensuel', unit: 'DH', formula: '(CA année en cours - CA année de référence)', m0: 32940, m1: 22104, targets: generateTargets(32940, 44466), isReverse: false, isMajor: true },
-                { id: 'v_cmd', title: 'Nombre de Commandes', unit: 'cmd', formula: 'Nb commandes mois m - Nb commandes mois référence', m0: 540, m1: 359, targets: generateTargets(540, 648), isReverse: false, isMajor: false },
-                { id: 'v_ticket', title: 'Ticket Moyen', unit: 'DH', formula: 'Ticket moyen du mois actuel - Ticket moyen de référence', m0: 61.00, m1: 61.57, targets: generateTargets(61, 68.62), isReverse: false, isMajor: false }
+                { id: 'v_ca', unit: 'DH', m0: 32940, m1: 22104, targets: generateTargets(32940, 44466), isReverse: false, isMajor: true },
+                { id: 'v_cmd', unit: 'cmd', m0: 540, m1: 359, targets: generateTargets(540, 648), isReverse: false, isMajor: false },
+                { id: 'v_ticket', unit: 'DH', m0: 61.00, m1: 61.57, targets: generateTargets(61, 68.62), isReverse: false, isMajor: false }
             ],
             achat: [
-                { id: 'a_rupt_nc', title: 'Rupture MP Non Critiques', unit: '%', formula: '(Nombre de matières premières non critiques en rupture de stock / Nombre total de matières premières non critiques) × 100', m0: 8.93, m1: 8.93, targets: generateTargets(8.93, 3.57), isReverse: true, isMajor: false },
-                { id: 'a_rupt_c', title: 'Rupture MP Critiques', unit: '%', formula: '(Nombre de matières premières critiques en rupture de stock / Nombre total de matières premières critiques) × 100', m0: 16.6, m1: 16.6, targets: generateTargets(16.6, 0), isReverse: true, isMajor: false },
-                { id: 'a_stock', title: 'MP Respectant Stock Min', unit: '%', formula: '(Nombre de matières premières respectant le stock minimum / Nombre total de matières premières) × 100', m0: 89.71, m1: 89.71, targets: generateTargets(89.71, 95), isReverse: false, isMajor: true }
+                { id: 'a_rupt_nc', unit: '%', m0: 8.93, m1: 8.93, targets: generateTargets(8.93, 3.57), isReverse: true, isMajor: false },
+                { id: 'a_rupt_c', unit: '%', m0: 16.6, m1: 16.6, targets: generateTargets(16.6, 0), isReverse: true, isMajor: false },
+                { id: 'a_stock', unit: '%', m0: 89.71, m1: 89.71, targets: generateTargets(89.71, 95), isReverse: false, isMajor: true }
             ],
             prepa: [
-                { id: 'p_temps', title: 'Temps Moyen de Préparation', unit: 'min', formula: 'Somme des temps de préparation des plats au cours du mois / Nombre total de plats préparés au cours du mois', m0: 20, m1: 20, targets: generateTargets(20, 15), isReverse: true, isMajor: true },
-                { id: 'p_retard', title: 'Taux de Commandes en Retard', unit: '%', formula: '(Nombre de commandes dépassant le délai prévu / Nombre total de commandes préparées) × 100', m0: 10.0, m1: 9.0, targets: generateTargets(10, 5), isReverse: true, isMajor: false }
+                { id: 'p_temps', unit: 'min', m0: 20, m1: 20, targets: generateTargets(20, 15), isReverse: true, isMajor: true },
+                { id: 'p_retard', unit: '%', m0: 10.0, m1: 9.0, targets: generateTargets(10, 5), isReverse: true, isMajor: false }
             ],
             service: [
-                { id: 's_retours', title: 'Nombre de Retours Clients', unit: 'retours', formula: 'Nombre de retours clients du mois = nombre de réponses enregistrées dans le Google Forms sur le mois', m0: 15, m1: 26, targets: generateTargets(15, 30), isReverse: false, isMajor: false },
-                { id: 's_reclam', title: 'Taux de Réclamation', unit: '%', formula: '(Nombre de réclamations clients concernant les plats / Nombre total de plats servis) × 100', m0: 5.0, m1: 4.5, targets: generateTargets(5, 3), isReverse: true, isMajor: false },
-                { id: 's_indice', title: 'Indice Global Expérience Client', unit: 'pts', formula: 'Moyenne pondérée des scores des 2 indicateurs', m0: 72.5, m1: 73.5, targets: generateTargets(72.5, 82.5), isReverse: false, isMajor: true }
+                { id: 's_retours', unit: 'retours', m0: 15, m1: 26, targets: generateTargets(15, 30), isReverse: false, isMajor: false },
+                { id: 's_reclam', unit: '%', m0: 5.0, m1: 4.5, targets: generateTargets(5, 3), isReverse: true, isMajor: false },
+                { id: 's_indice', unit: 'pts', m0: 72.5, m1: 73.5, targets: generateTargets(72.5, 82.5), isReverse: false, isMajor: true }
             ]
         };
 
@@ -338,7 +376,6 @@
             const textColor = isDark ? '#94a3b8' : '#475569';
             const gridColor = isDark ? '#334155' : '#e2e8f0';
             
-            // Mise à jour dynamique du selecteur de mois dans le modal
             const monthSelect = document.getElementById('edit-month');
             if(monthSelect) {
                 monthSelect.innerHTML = '';
@@ -348,54 +385,54 @@
                 }
             }
 
-            // 1. Gérant (4 Cartes + 4 Graphiques Majeurs avec noms exacts)
+            // 1. Gérant (4 Cartes + 4 Graphiques Majeurs)
             document.getElementById('content-gerant').innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <div class="card p-6 border-t-4 border-blue-500">
-                        <p class="text-xs font-bold text-muted uppercase">${appData.ventes[0].title} (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${t(appData.ventes[0].id + '_title')} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.ventes[0].m0.toLocaleString()} <span class="text-sm font-normal">DH</span></h3>
-                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.ventes[0].targets[12].toLocaleString()} DH</p>
+                        <p class="text-sm text-muted mt-2">${t('target_m12')} : ${appData.ventes[0].targets[12].toLocaleString()} DH</p>
                     </div>
                     <div class="card p-6 border-t-4 border-emerald-500">
-                        <p class="text-xs font-bold text-muted uppercase">${appData.achat[2].title} (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${t(appData.achat[2].id + '_title')} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.achat[2].m0} <span class="text-sm font-normal">%</span></h3>
-                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.achat[2].targets[12].toFixed(1)} %</p>
+                        <p class="text-sm text-muted mt-2">${t('target_m12')} : ${appData.achat[2].targets[12].toFixed(1)} %</p>
                     </div>
                     <div class="card p-6 border-t-4 border-amber-500">
-                        <p class="text-xs font-bold text-muted uppercase">${appData.prepa[0].title} (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${t(appData.prepa[0].id + '_title')} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.prepa[0].m0} <span class="text-sm font-normal">min</span></h3>
-                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.prepa[0].targets[12].toFixed(1)} min</p>
+                        <p class="text-sm text-muted mt-2">${t('target_m12')} : ${appData.prepa[0].targets[12].toFixed(1)} min</p>
                     </div>
                     <div class="card p-6 border-t-4 border-purple-500">
-                        <p class="text-xs font-bold text-muted uppercase">${appData.service[2].title} (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${t(appData.service[2].id + '_title')} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.service[2].m0} <span class="text-sm font-normal">pts</span></h3>
-                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.service[2].targets[12].toFixed(1)} pts</p>
+                        <p class="text-sm text-muted mt-2">${t('target_m12')} : ${appData.service[2].targets[12].toFixed(1)} pts</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold">${appData.ventes[0].title}</h3>
-                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.ventes[0].m1} ${appData.ventes[0].unit}</span> | Cible M12: ${appData.ventes[0].targets[12].toFixed(2)} ${appData.ventes[0].unit}</p>
-                        <div class="formula">${appData.ventes[0].formula}</div>
+                        <h3 class="text-lg font-bold">${t(appData.ventes[0].id + '_title')}</h3>
+                        <p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${appData.ventes[0].m1} ${appData.ventes[0].unit}</span> | ${t('target_m12')}: ${appData.ventes[0].targets[12].toFixed(2)} ${appData.ventes[0].unit}</p>
+                        <div class="formula">${t(appData.ventes[0].id + '_formula')}</div>
                         <div class="chart-container"><canvas id="chart-gerant-v_ca"></canvas></div>
                     </div>
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold">${appData.achat[2].title}</h3>
-                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.achat[2].m1} ${appData.achat[2].unit}</span> | Cible M12: ${appData.achat[2].targets[12].toFixed(2)} ${appData.achat[2].unit}</p>
-                        <div class="formula">${appData.achat[2].formula}</div>
+                        <h3 class="text-lg font-bold">${t(appData.achat[2].id + '_title')}</h3>
+                        <p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${appData.achat[2].m1} ${appData.achat[2].unit}</span> | ${t('target_m12')}: ${appData.achat[2].targets[12].toFixed(2)} ${appData.achat[2].unit}</p>
+                        <div class="formula">${t(appData.achat[2].id + '_formula')}</div>
                         <div class="chart-container"><canvas id="chart-gerant-a_stock"></canvas></div>
                     </div>
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold">${appData.prepa[0].title}</h3>
-                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.prepa[0].m1} ${appData.prepa[0].unit}</span> | Cible M12: ${appData.prepa[0].targets[12].toFixed(2)} ${appData.prepa[0].unit}</p>
-                        <div class="formula">${appData.prepa[0].formula}</div>
+                        <h3 class="text-lg font-bold">${t(appData.prepa[0].id + '_title')}</h3>
+                        <p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${appData.prepa[0].m1} ${appData.prepa[0].unit}</span> | ${t('target_m12')}: ${appData.prepa[0].targets[12].toFixed(2)} ${appData.prepa[0].unit}</p>
+                        <div class="formula">${t(appData.prepa[0].id + '_formula')}</div>
                         <div class="chart-container"><canvas id="chart-gerant-p_temps"></canvas></div>
                     </div>
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold">${appData.service[2].title}</h3>
-                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.service[2].m1} ${appData.service[2].unit}</span> | Cible M12: ${appData.service[2].targets[12].toFixed(2)} ${appData.service[2].unit}</p>
-                        <div class="formula">${appData.service[2].formula}</div>
+                        <h3 class="text-lg font-bold">${t(appData.service[2].id + '_title')}</h3>
+                        <p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${appData.service[2].m1} ${appData.service[2].unit}</span> | ${t('target_m12')}: ${appData.service[2].targets[12].toFixed(2)} ${appData.service[2].unit}</p>
+                        <div class="formula">${t(appData.service[2].id + '_formula')}</div>
                         <div class="chart-container"><canvas id="chart-gerant-s_indice"></canvas></div>
                     </div>
                 </div>`;
@@ -403,7 +440,7 @@
             // 2. Processus
             const buildProcessHtml = (processKey) => {
                 let html = ''; appData[processKey].forEach(ind => {
-                    html += `<div class="card p-6 mb-6"><h3 class="text-lg font-bold">${ind.title}</h3><p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${ind.m1} ${ind.unit}</span> | Cible M12: ${ind.targets[12].toFixed(2)} ${ind.unit}</p><div class="formula">${ind.formula}</div><div class="chart-container"><canvas id="chart-${ind.id}"></canvas></div></div>`;
+                    html += `<div class="card p-6 mb-6"><h3 class="text-lg font-bold">${t(ind.id + '_title')}</h3><p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${ind.m1} ${ind.unit}</span> | ${t('target_m12')}: ${ind.targets[12].toFixed(2)} ${ind.unit}</p><div class="formula">${t(ind.id + '_formula')}</div><div class="chart-container"><canvas id="chart-${ind.id}"></canvas></div></div>`;
                 }); return html;
             };
             document.getElementById('content-ventes').innerHTML = buildProcessHtml('ventes');
@@ -417,32 +454,26 @@
             const create3Axis = (canvasId, ind) => {
                 const ctx = document.getElementById(canvasId).getContext('2d');
                 let realised = [], cumulated = [];
-                
-                let cumulCA = 0, cumulCmd = 0, cumulCAProj = 0, cumulCmdProj = 0;
 
                 for (let i = 0; i <= 12; i++) {
                     if (i === 0) { realised.push(ind.m0); }
                     else if (i === 1) { realised.push(ind.m1); }
                     else { realised.push(null); }
 
-                    if (ind.id === 'v_ticket') {
-                        if (i === 0) { cumulCA = appData.ventes[0].m0; cumulCmd = appData.ventes[1].m0; cumulated.push(ind.m0); }
-                        else if (i === 1) { cumulCA += appData.ventes[0].m1; cumulCmd += appData.ventes[1].m1; cumulated.push((cumulCA / cumulCmd).toFixed(2)); }
-                        else {
-                            cumulCAProj = cumulCA + appData.ventes[0].targets.slice(1, i+1).reduce((a,b)=>a+b, 0);
-                            cumulCmdProj = cumulCmd + appData.ventes[1].targets.slice(1, i+1).reduce((a,b)=>a+b, 0);
-                            cumulated.push((cumulCAProj / cumulCmdProj).toFixed(2));
+                    if (i === 0) {
+                        cumulated.push(ind.m0);
+                    } else if (i === 1) {
+                        if (ind.id === 'v_ticket') {
+                            const caTotal = appData.ventes[0].m0 + appData.ventes[0].m1;
+                            const cmdTotal = appData.ventes[1].m0 + appData.ventes[1].m1;
+                            cumulated.push((caTotal / cmdTotal).toFixed(2));
+                        } else if (ind.isReverse) {
+                            cumulated.push(((ind.m0 + ind.m1) / 2).toFixed(2));
+                        } else {
+                            cumulated.push((ind.m0 + ind.m1).toFixed(2));
                         }
-                    } else if (ind.isReverse) {
-                        let cumul = ind.m0;
-                        if (i === 0) { cumulated.push(ind.m0); }
-                        else if (i === 1) { cumul += ind.m1; cumulated.push((cumul / 2).toFixed(2)); }
-                        else { cumul += ind.targets[i]; cumulated.push((cumul / (i + 1)).toFixed(2)); }
                     } else {
-                        let cumul = ind.m0;
-                        if (i === 0) { cumulated.push(ind.m0); }
-                        else if (i === 1) { cumul += ind.m1; cumulated.push(cumul.toFixed(2)); }
-                        else { cumul += ind.targets[i]; cumulated.push(cumul.toFixed(2)); }
+                        cumulated.push(null); // S'arrête à M1
                     }
                 }
 
@@ -451,7 +482,7 @@
                     data: { labels: ['M0','M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'], datasets: [
                         { type: 'bar', label: t('chart_actual'), data: realised, backgroundColor: '#10b981', yAxisID: 'y', order: 3 },
                         { type: 'bar', label: t('chart_target'), data: ind.targets, backgroundColor: '#3b82f6', yAxisID: 'y', order: 2 },
-                        { type: 'line', label: ind.isReverse ? t('chart_avg_cumul') : (ind.id === 'v_ticket' ? 'Ticket moyen cumulé' : t('chart_cumul')), data: cumulated, borderColor: '#f97316', backgroundColor: '#f97316', pointBackgroundColor: '#fff', pointBorderColor: '#f97316', yAxisID: 'y1', order: 1, borderWidth: 2 }
+                        { type: 'line', label: ind.isReverse ? t('chart_avg_cumul') : (ind.id === 'v_ticket' ? t('ticket_cumul') : t('chart_cumul')), data: cumulated, borderColor: '#f97316', backgroundColor: '#f97316', pointBackgroundColor: '#fff', pointBorderColor: '#f97316', yAxisID: 'y1', order: 1, borderWidth: 2, spanGaps: false }
                     ]},
                     options: { 
                         responsive: true, maintainAspectRatio: false, 
@@ -459,7 +490,7 @@
                         scales: { 
                             x: { title: { display: true, text: t('chart_month'), color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, 
                             y: { position: 'left', title: { display: true, text: `${t('chart_monthly_val')} (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { color: gridColor }, grace: '20%' }, 
-                            y1: { position: 'right', title: { display: true, text: ind.isReverse ? `${t('chart_avg_cumul')} (${ind.unit})` : (ind.id === 'v_ticket' ? 'Ticket moyen cumulé (DH)' : `${t('chart_cumul')} (${ind.unit})`), color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false }, grace: '20%' } 
+                            y1: { position: 'right', title: { display: true, text: ind.isReverse ? `${t('chart_avg_cumul')} (${ind.unit})` : (ind.id === 'v_ticket' ? `${t('ticket_cumul')} (DH)` : `${t('chart_cumul')} (${ind.unit})`), color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false }, grace: '20%' } 
                         } 
                     }
                 });
@@ -492,7 +523,7 @@
                     if (currentModalFilter === 'major' && !ind.isMajor) return;
                     if (currentModalFilter === 'sub' && ind.isMajor) return;
                     let val = ind.targets[currentModalMonth];
-                    html += `<div><label class="text-xs font-bold text-muted mb-1 block">${ind.title} (${ind.unit})</label><input type="number" step="0.01" id="target-${p}-${ind.id}" value="${val.toFixed(2)}" class="w-full p-2 rounded input-field"></div>`;
+                    html += `<div><label class="text-xs font-bold text-muted mb-1 block">${t(ind.id + '_title')} (${ind.unit})</label><input type="number" step="0.01" id="target-${p}-${ind.id}" value="${val.toFixed(2)}" class="w-full p-2 rounded input-field"></div>`;
                 });
             });
             document.getElementById('target-inputs').innerHTML = html;
@@ -510,7 +541,7 @@
                     const newVal = parseFloat(inputEl.value);
                     const oldVal = ind.targets[currentModalMonth];
                     if (newVal !== oldVal) {
-                        changeHistory.unshift({ date: now, user: user, process: p, indicator: ind.title, month: 'M' + currentModalMonth, oldVal: oldVal.toFixed(2), newVal: newVal.toFixed(2) });
+                        changeHistory.unshift({ date: now, user: user, process: p, indicator: t(ind.id + '_title'), month: 'M' + currentModalMonth, oldVal: oldVal.toFixed(2), newVal: newVal.toFixed(2) });
                         ind.targets[currentModalMonth] = newVal;
                     }
                 });
@@ -521,10 +552,10 @@
 
         function openHistoryModal() {
             let html = '';
-            if (changeHistory.length === 0) { html = '<p class="text-muted text-center py-4">Aucune modification enregistrée.</p>'; } 
+            if (changeHistory.length === 0) { html = `<p class="text-muted text-center py-4">${t('no_history')}</p>`; } 
             else {
                 changeHistory.forEach(h => {
-                    html += `<div class="p-3 border-l-4 border-amber-500 rounded text-sm flex justify-between items-center bg-gray-50 dark:bg-gray-800"><div><span class="text-xs text-muted">${h.date} par <b>${h.user}</b></span><br><b>${h.indicator}</b> (${h.month}) : <span class="text-red-500 line-through">${h.oldVal}</span> ➔ <span class="text-emerald-500 font-bold">${h.newVal}</span></div><div class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">${h.process.toUpperCase()}</div></div>`;
+                    html += `<div class="p-3 border-l-4 border-amber-500 rounded text-sm flex justify-between items-center bg-gray-50 dark:bg-gray-800"><div><span class="text-xs text-muted">${h.date} ${t('by')} <b>${h.user}</b></span><br><b>${h.indicator}</b> (${h.month}) : <span class="text-red-500 line-through">${h.oldVal}</span> ➔ <span class="text-emerald-500 font-bold">${h.newVal}</span></div><div class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">${h.process.toUpperCase()}</div></div>`;
                 });
             }
             document.getElementById('history-content').innerHTML = html; document.getElementById('history-modal').classList.remove('hidden');
@@ -536,14 +567,21 @@
             const processes = ['ventes', 'achat', 'prepa', 'service'];
             processes.forEach(p => {
                 appData[p].forEach(ind => {
-                    let row = { "Processus": p, "Indicateur": ind.title, "Formule": ind.formula, "Unite": ind.unit, "Réalisé M0": ind.m0, "Réalisé M1": ind.m1 };
+                    let row = { 
+                        "Processus": p, 
+                        "Indicateur": t(ind.id + '_title'), 
+                        "Formule": t(ind.id + '_formula'), 
+                        "Unite": ind.unit, 
+                        "Réalisé M0": ind.m0, 
+                        "Réalisé M1": ind.m1 
+                    };
                     for(let m=1; m<=12; m++) row[`Cible M${m}`] = parseFloat(ind.targets[m].toFixed(2));
                     allData.push(row);
                 });
             });
             const ws = XLSX.utils.json_to_sheet(allData); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Tableau_de_Bord");
-            XLSX.writeFile(wb, "H-Pizza_Synthese_Complete.xlsx");
+            XLSX.writeFile(wb, "Hello_Pizza_Synthese_Complete.xlsx");
         }
 
         async function syncData() {
@@ -568,7 +606,6 @@
             finally { setTimeout(() => { btn.disabled = false; btn.classList.replace('bg-emerald-600', 'bg-blue-600'); btn.classList.replace('bg-red-600', 'bg-blue-600'); icon.innerText = '🔄'; text.innerText = t('btn_sync'); }, 3000); }
         }
         
-        // Initialisation au chargement
         applyTranslations();
     </script>
 </body>
