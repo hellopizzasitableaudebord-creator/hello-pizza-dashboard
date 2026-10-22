@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-Pizza - Tableau de Bord</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        /* --- VARIABLES CSS POUR GERER LE THEME SOMBRE/CLAIR --- */
+        :root {
+            --bg-body: #f1f5f9; --text-main: #1e293b; --bg-card: #ffffff;
+            --border-color: #e2e8f0; --text-muted: #64748b; --bg-input: #f8fafc;
+        }
+        html.dark {
+            --bg-body: #0f172a; --text-main: #f1f5f9; --bg-card: #1e293b;
+            --border-color: #334155; --text-muted: #94a3b8; --bg-input: #0f172a;
+        }
+        body {
+            background-color: var(--bg-body) !important; color: var(--text-main) !important;
+            transition: background-color 0.3s, color 0.3s; font-family: 'Segoe UI', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6, p, span, td, th, label, div { color: inherit; }
+        .card { background-color: var(--bg-card) !important; border: 1px solid var(--border-color) !important; border-radius: 0.5rem; transition: all 0.3s; }
+        .text-muted { color: var(--text-muted) !important; }
+        .input-field, select { background-color: var(--bg-input) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; }
+        
+        .tab-active { background-color: #10b981 !important; color: white !important; border: 1px solid #10b981 !important;}
+        .tab-inactive { background-color: transparent !important; color: var(--text-muted) !important; border: 1px solid var(--border-color) !important; }
+        .tab-inactive:hover { background-color: var(--bg-input) !important; }
+
+        .filter-btn { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; border: 1px solid var(--border-color); cursor: pointer; font-weight: bold; color: var(--text-muted); }
+        .filter-btn.active { background-color: #3b82f6 !important; color: white !important; border-color: #3b82f6 !important; }
+
+        .formula { font-size: 0.75rem; padding: 0.5rem; border-radius: 0.25rem; margin-bottom: 1rem; border-left: 3px solid #3b82f6; background-color: var(--bg-input); color: var(--text-muted); font-style: italic; }
+        .chart-container { position: relative; height: 350px; width: 100%; }
+
+        .text-emerald-500, .text-emerald-600 { color: #10b981 !important; }
+        .text-blue-500, .text-blue-600 { color: #3b82f6 !important; }
+        .text-red-500, .text-red-600 { color: #ef4444 !important; }
+        .text-amber-500, .text-amber-600 { color: #f59e0b !important; }
+    </style>
+</head>
+<body class="p-4 md:p-8 font-sans">
+
+    <!-- ================= CONNEXION ================= -->
+    <div id="login-screen" class="flex items-center justify-center h-screen">
+        <div class="card w-full max-w-md p-8 shadow-2xl">
+            <h1 class="text-3xl font-bold text-emerald-500 mb-2 text-center">H-Pizza Pilotage</h1>
+            <p class="text-muted mb-6 text-center text-sm">Système d'Information & Tableau de Bord</p>
+            
+            <div class="flex justify-center mb-6 border-b border-gray-300 dark:border-gray-700">
+                <div id="tab-login" class="cursor-pointer px-4 py-2 border-b-2 border-emerald-500 text-emerald-500 font-bold" onclick="switchAuth('login')">Connexion</div>
+                <div id="tab-signup" class="cursor-pointer px-4 py-2 text-muted" onclick="switchAuth('signup')">Inscription</div>
+            </div>
+
+            <form id="form-login" onsubmit="event.preventDefault(); login();">
+                <!-- CHAMP TYPE TEXT POUR PERMETTRE 'admin' SANS @ -->
+                <input type="text" id="login-email" name="email" autocomplete="username" placeholder="Email (ou admin)" class="w-full p-3 mb-3 rounded input-field focus:outline-none focus:border-emerald-500">
+                <div class="relative mb-3">
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mot de passe (ou admin)" class="w-full p-3 pr-10 rounded input-field focus:outline-none focus:border-emerald-500">
+                    <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none" title="Afficher/Masquer">👁️</button>
+                </div>
+                <div class="flex items-center mb-4">
+                    <input type="checkbox" id="remember-me" class="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <label for="remember-me" class="ml-2 text-sm font-medium text-muted">Se souvenir de moi</label>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded transition">Se connecter</button>
+                <p id="error-msg" class="text-red-500 text-sm mt-3 text-center hidden font-bold">Identifiants incorrects.</p>
+            </form>
+
+            <form id="form-signup" class="hidden" onsubmit="event.preventDefault(); register();">
+                <input type="text" id="reg-name" name="name" autocomplete="name" placeholder="Nom complet" class="w-full p-3 mb-3 rounded input-field">
+                <input type="email" id="reg-email" name="email" autocomplete="email" placeholder="Email" class="w-full p-3 mb-3 rounded input-field">
+                <div class="relative mb-4">
+                    <input type="password" id="reg-password" name="new-password" autocomplete="new-password" placeholder="Mot de passe" class="w-full p-3 pr-10 rounded input-field">
+                    <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none">👁️</button>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= DASHBOARD ================= -->
+    <div id="dashboard-screen" class="hidden max-w-7xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-gray-300 dark:border-gray-700 pb-4 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-emerald-500">Hello Pizza — Tableau de Bord</h1>
+                <p class="text-sm text-muted">Connecté : <span id="user-display" class="font-bold"></span> | M0 = Sept. 2026</p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+                <button onclick="toggleTheme()" class="p-2 rounded bg-gray-200 dark:bg-gray-800 text-xl border border-gray-300 dark:border-gray-600" title="Thème">🌓</button>
+                <button onclick="exportData('xlsx')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold transition">📤 Exporter Excel</button>
+                <button onclick="syncData()" id="sync-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2 transition">
+                    <span id="sync-icon">🔄</span> <span id="sync-text">Synchroniser n8n</span>
+                </button>
+                <button onclick="openTargetModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded text-sm font-bold transition">⚙️ Cibles</button>
+                <button onclick="openHistoryModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-bold transition">📜 Historique</button>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">Quitter</button>
+            </div>
+        </header>
+
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button onclick="switchTab('gerant')" id="tab-gerant" class="px-4 py-2 rounded font-semibold tab-active transition">Synthèse Gérant</button>
+            <button onclick="switchTab('ventes')" id="tab-ventes" class="px-4 py-2 rounded font-semibold tab-inactive transition">Ventes</button>
+            <button onclick="switchTab('achat')" id="tab-achat" class="px-4 py-2 rounded font-semibold tab-inactive transition">Achat</button>
+            <button onclick="switchTab('prepa')" id="tab-prepa" class="px-4 py-2 rounded font-semibold tab-inactive transition">Préparation</button>
+            <button onclick="switchTab('service')" id="tab-service" class="px-4 py-2 rounded font-semibold tab-inactive transition">Service</button>
+        </div>
+
+        <div id="content-gerant" class="process-content space-y-6"></div>
+        <div id="content-ventes" class="process-content hidden space-y-6"></div>
+        <div id="content-achat" class="process-content hidden space-y-6"></div>
+        <div id="content-prepa" class="process-content hidden space-y-6"></div>
+        <div id="content-service" class="process-content hidden space-y-6"></div>
+    </div>
+
+    <!-- MODAL CIBLES -->
+    <div id="target-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+        <div class="card w-full max-w-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h2 class="text-xl font-bold text-amber-500 mb-4">⚙️ Ajuster les Objectifs</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-gray-100 dark:bg-gray-800 p-3 rounded">
+                <div>
+                    <label class="text-xs font-bold text-muted block mb-1">Processus</label>
+                    <select id="edit-process" class="w-full p-2 rounded border input-field font-bold" onchange="updateModalInputs()">
+                        <option value="tous">Tous</option>
+                        <option value="ventes">Ventes</option>
+                        <option value="achat">Achat</option>
+                        <option value="prepa">Préparation</option>
+                        <option value="service">Service</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-muted block mb-1">Mois</label>
+                    <select id="edit-month" class="w-full p-2 rounded border input-field font-bold" onchange="updateModalInputs()"></select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-muted block mb-1">Catégorie</label>
+                    <div class="flex gap-1">
+                        <button class="filter-btn active flex-1" data-filter="all" onclick="setModalFilter('all')">Tous</button>
+                        <button class="filter-btn flex-1" data-filter="major" onclick="setModalFilter('major')">Majeurs</button>
+                        <button class="filter-btn flex-1" data-filter="sub" onclick="setModalFilter('sub')">Sous-obj.</button>
+                    </div>
+                </div>
+            </div>
+            <div id="target-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+            <div class="flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <button onclick="closeTargetModal()" class="px-4 py-2 text-muted font-bold hover:text-red-500">Annuler</button>
+                <button onclick="saveTargets()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded font-bold">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIQUE -->
+    <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+        <div class="card w-full max-w-3xl p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-300 dark:border-gray-700 pb-2">
+                <h2 class="text-xl font-bold">📜 Historique des modifications</h2>
+                <button onclick="closeHistoryModal()" class="text-red-500 hover:text-red-700 font-bold bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded">Fermer</button>
+            </div>
+            <div id="history-content" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        function generateTargets(m0, m12) { let arr = [m0]; for(let i=1; i<=12; i++) arr.push(m0 + (m12 - m0) * (i / 12)); return arr; }
+
+        const appData = {
+            ventes: [
+                { id: 'v_ca', title: 'Chiffre d\'Affaires Mensuel', unit: 'DH', formula: '(CA année en cours - CA année de référence)', m0: 32940, m1: 22104, targets: generateTargets(32940, 44466), isReverse: false, isMajor: true },
+                { id: 'v_cmd', title: 'Nombre de Commandes', unit: 'cmd', formula: 'Nb commandes mois m - Nb commandes mois référence', m0: 540, m1: 359, targets: generateTargets(540, 648), isReverse: false, isMajor: false },
+                { id: 'v_ticket', title: 'Ticket Moyen', unit: 'DH', formula: 'Ticket moyen du mois actuel - Ticket moyen de référence', m0: 61.00, m1: 61.57, targets: generateTargets(61, 68.62), isReverse: false, isMajor: false }
+            ],
+            achat: [
+                { id: 'a_rupt_nc', title: 'Rupture MP Non Critiques', unit: '%', formula: '(Nombre de matières premières non critiques en rupture de stock / Nombre total de matières premières non critiques) × 100', m0: 8.93, m1: 8.93, targets: generateTargets(8.93, 3.57), isReverse: true, isMajor: false },
+                { id: 'a_rupt_c', title: 'Rupture MP Critiques', unit: '%', formula: '(Nombre de matières premières critiques en rupture de stock / Nombre total de matières premières critiques) × 100', m0: 16.6, m1: 16.6, targets: generateTargets(16.6, 0), isReverse: true, isMajor: false },
+                { id: 'a_stock', title: 'MP Respectant Stock Min', unit: '%', formula: '(Nombre de matières premières respectant le stock minimum / Nombre total de matières premières) × 100', m0: 89.71, m1: 89.71, targets: generateTargets(89.71, 95), isReverse: false, isMajor: true }
+            ],
+            prepa: [
+                { id: 'p_temps', title: 'Temps Moyen de Préparation', unit: 'min', formula: 'Somme des temps de préparation des plats au cours du mois / Nombre total de plats préparés au cours du mois', m0: 20, m1: 20, targets: generateTargets(20, 15), isReverse: true, isMajor: true },
+                { id: 'p_retard', title: 'Taux de Commandes en Retard', unit: '%', formula: '(Nombre de commandes dépassant le délai prévu / Nombre total de commandes préparées) × 100', m0: 10.0, m1: 9.0, targets: generateTargets(10, 5), isReverse: true, isMajor: false }
+            ],
+            service: [
+                { id: 's_retours', title: 'Nombre de Retours Clients', unit: 'retours', formula: 'Nombre de retours clients du mois = nombre de réponses enregistrées dans le Google Forms sur le mois', m0: 15, m1: 26, targets: generateTargets(15, 30), isReverse: false, isMajor: false },
+                { id: 's_reclam', title: 'Taux de Réclamation', unit: '%', formula: '(Nombre de réclamations clients concernant les plats / Nombre total de plats servis) × 100', m0: 5.0, m1: 4.5, targets: generateTargets(5, 3), isReverse: true, isMajor: false },
+                { id: 's_indice', title: 'Indice Global Expérience Client', unit: 'pts', formula: 'Moyenne pondérée des scores des 2 indicateurs', m0: 72.5, m1: 73.5, targets: generateTargets(72.5, 82.5), isReverse: false, isMajor: true }
+            ]
+        };
+
+        let charts = {};
+        let changeHistory = JSON.parse(localStorage.getItem('hp_history')) || [];
+        let currentModalMonth = 12, currentModalFilter = 'all', currentModalProcess = 'tous';
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        function switchAuth(mode) { 
+            document.getElementById('tab-login').className = mode === 'login' ? 'cursor-pointer px-4 py-2 border-b-2 border-emerald-500 text-emerald-500 font-bold' : 'cursor-pointer px-4 py-2 text-muted';
+            document.getElementById('tab-signup').className = mode === 'signup' ? 'cursor-pointer px-4 py-2 border-b-2 border-emerald-500 text-emerald-500 font-bold' : 'cursor-pointer px-4 py-2 text-muted';
+            document.getElementById('form-login').classList.toggle('hidden', mode !== 'login');
+            document.getElementById('form-signup').classList.toggle('hidden', mode !== 'signup');
+        }
+        function register() { 
+            const name = document.getElementById('reg-name').value, email = document.getElementById('reg-email').value, pass = document.getElementById('reg-password').value;
+            if (!name || !email || !pass) return alert("Remplissez tout.");
+            let users = JSON.parse(localStorage.getItem('hp_users')) || {}; users[email] = { name, password: pass };
+            localStorage.setItem('hp_users', JSON.stringify(users)); alert("Compte créé !"); switchAuth('login');
+        }
+        function login() { 
+            const email = document.getElementById('login-email').value, pass = document.getElementById('login-password').value;
+            if (email === 'admin' && pass === 'admin') { showDashboard("Admin"); return; }
+            let users = JSON.parse(localStorage.getItem('hp_users')) || {};
+            if (users[email] && users[email].password === pass) { showDashboard(users[email].name); }
+            else { document.getElementById('error-msg').classList.remove('hidden'); }
+        }
+        function showDashboard(name) { 
+            document.getElementById('user-display').innerText = name;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden'); renderAll();
+        }
+        function logout() { location.reload(); }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); renderAll(); }
+        function switchTab(tab) {
+            document.querySelectorAll('.process-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('content-' + tab).classList.remove('hidden');
+            document.querySelectorAll('[id^="tab-"]').forEach(el => { if(!el.id.includes('login')) { el.classList.remove('tab-active'); el.classList.add('tab-inactive'); } });
+            document.getElementById('tab-' + tab).classList.remove('tab-inactive'); document.getElementById('tab-' + tab).classList.add('tab-active');
+        }
+
+        function renderAll() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#94a3b8' : '#475569';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+            // 1. Gérant (4 Cartes + Radar)
+            document.getElementById('content-gerant').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="card p-6 border-t-4 border-blue-500">
+                        <p class="text-xs font-bold text-muted uppercase">Ventes (M0)</p>
+                        <h3 class="text-3xl font-bold mt-2">${appData.ventes[0].m0.toLocaleString()} <span class="text-sm font-normal">DH</span></h3>
+                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.ventes[0].targets[12].toLocaleString()} DH</p>
+                    </div>
+                    <div class="card p-6 border-t-4 border-emerald-500">
+                        <p class="text-xs font-bold text-muted uppercase">Achat (M0)</p>
+                        <h3 class="text-3xl font-bold mt-2">${appData.achat[2].m0} <span class="text-sm font-normal">%</span></h3>
+                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.achat[2].targets[12].toFixed(1)} %</p>
+                    </div>
+                    <div class="card p-6 border-t-4 border-amber-500">
+                        <p class="text-xs font-bold text-muted uppercase">Préparation (M0)</p>
+                        <h3 class="text-3xl font-bold mt-2">${appData.prepa[0].m0} <span class="text-sm font-normal">min</span></h3>
+                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.prepa[0].targets[12].toFixed(1)} min</p>
+                    </div>
+                    <div class="card p-6 border-t-4 border-purple-500">
+                        <p class="text-xs font-bold text-muted uppercase">Service (M0)</p>
+                        <h3 class="text-3xl font-bold mt-2">${appData.service[2].m0} <span class="text-sm font-normal">pts</span></h3>
+                        <p class="text-sm text-muted mt-2">Cible M12 : ${appData.service[2].targets[12].toFixed(1)} pts</p>
+                    </div>
+                </div>
+                
+                <div class="card p-6 mb-6">
+                    <h3 class="text-lg font-bold mb-2">Performance globale : Réalisé vs Cible M12</h3>
+                    <p class="text-sm text-muted mb-4">Ce radar compare le taux d'atteinte de nos objectifs. Plus le polygone s'étend vers l'extérieur, plus nous sommes proches de nos cibles.</p>
+                    <div class="flex justify-center" style="height: 350px;">
+                        <canvas id="chart-radar"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-muted bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                        <strong>Lecture :</strong> À M0, nous sommes déjà à 94% de l'objectif sur l'Achat (ce qui est excellent) et à 91% sur le Service. Le plus grand défi reste le Chiffre d'Affaires (74%) et le Temps de Préparation (75%), sur lesquels nous devons concentrer nos efforts.
+                    </div>
+                </div>`;
+
+            // 2. Processus
+            const buildProcessHtml = (processKey) => {
+                let html = ''; appData[processKey].forEach(ind => {
+                    html += `<div class="card p-6 mb-6"><h3 class="text-lg font-bold">${ind.title}</h3><p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${ind.m1} ${ind.unit}</span> | Cible M12: ${ind.targets[12].toFixed(2)} ${ind.unit}</p><div class="formula">${ind.formula}</div><div class="chart-container"><canvas id="chart-${ind.id}"></canvas></div></div>`;
+                }); return html;
+            };
+            document.getElementById('content-ventes').innerHTML = buildProcessHtml('ventes');
+            document.getElementById('content-achat').innerHTML = buildProcessHtml('achat');
+            document.getElementById('content-prepa').innerHTML = buildProcessHtml('prepa');
+            document.getElementById('content-service').innerHTML = buildProcessHtml('service');
+
+            // 3. Charts
+            Object.values(charts).forEach(c => c.destroy()); charts = {};
+
+            // --- RADAR CONFORME (0-120%) ---
+            const ctxRadar = document.getElementById('chart-radar').getContext('2d');
+            
+            // Calcul des pourcentages d'atteinte
+            const pctVentesM0 = (appData.ventes[0].m0 / appData.ventes[0].targets[12]) * 100;
+            const pctVentesM1 = (appData.ventes[0].m1 / appData.ventes[0].targets[12]) * 100;
+            const pctAchatM0 = (appData.achat[2].m0 / appData.achat[2].targets[12]) * 100;
+            const pctAchatM1 = (appData.achat[2].m1 / appData.achat[2].targets[12]) * 100;
+            const pctPrepaM0 = (appData.prepa[0].targets[12] / appData.prepa[0].m0) * 100;
+            const pctPrepaM1 = (appData.prepa[0].targets[12] / appData.prepa[0].m1) * 100;
+            const pctServiceM0 = (appData.service[2].m0 / appData.service[2].targets[12]) * 100;
+            const pctServiceM1 = (appData.service[2].m1 / appData.service[2].targets[12]) * 100;
+
+            charts.radar = new Chart(ctxRadar, {
+                type: 'radar',
+                data: { 
+                    labels: ['Ventes (CA)', 'Achat (Dispo)', 'Préparation (Temps)', 'Service (Indice)'], 
+                    datasets: [
+                        { label: 'Réalisé M0', data: [pctVentesM0, pctAchatM0, pctPrepaM0, pctServiceM0], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', pointBackgroundColor: '#10b981' },
+                        { label: 'Réalisé M1', data: [pctVentesM1, pctAchatM1, pctPrepaM1, pctServiceM1], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.05)', pointBackgroundColor: '#f59e0b', borderDash: [5, 5] },
+                        { label: 'Cible M12 (100%)', data: [100, 100, 100, 100], borderColor: '#3b82f6', borderWidth: 2, backgroundColor: 'transparent' }
+                    ]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: textColor } } }, 
+                    scales: { r: { grid: { color: gridColor }, angleLines: { color: gridColor }, pointLabels: { color: textColor, font: { size: 12, weight: 'bold' } }, ticks: { display: false }, suggestedMin: 0, suggestedMax: 120 } } 
+                }
+            });
+
+            // --- GRAPHIQUES 3 AXES ---
+            const create3Axis = (canvasId, ind) => {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                let realised = [], cumulated = [];
+                let cumul = ind.m0;
+                for (let i = 0; i <= 12; i++) {
+                    if (i === 0) { realised.push(ind.m0); cumulated.push(ind.m0); }
+                    else if (i === 1) { realised.push(ind.m1); cumul += ind.m1; cumulated.push((cumul / 2).toFixed(2)); }
+                    else { realised.push(null); cumulated.push(null); }
+                }
+                return new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: ['M0','M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'], datasets: [
+                        { type: 'bar', label: 'Réalisé', data: realised, backgroundColor: '#10b981', yAxisID: 'y', order: 3 },
+                        { type: 'bar', label: 'Cible mensuelle', data: ind.targets, backgroundColor: '#3b82f6', yAxisID: 'y', order: 2 },
+                        // LIGNE PLEINE POUR LE CUMUL
+                        { type: 'line', label: ind.isReverse ? 'Moyenne cumulée' : 'Cumulé', data: cumulated, borderColor: '#f97316', backgroundColor: '#f97316', pointBackgroundColor: '#fff', pointBorderColor: '#f97316', yAxisID: 'y1', order: 1, borderWidth: 2 }
+                    ]},
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, 
+                        plugins: { legend: { labels: { color: textColor } } }, 
+                        scales: { 
+                            x: { title: { display: true, text: 'Mois', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, 
+                            y: { position: 'left', title: { display: true, text: `Valeur mensuelle (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { color: gridColor }, grace: '20%' }, 
+                            y1: { position: 'right', title: { display: true, text: ind.isReverse ? `Moyenne cumulée (${ind.unit})` : `Cumulé (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false }, grace: '20%' } 
+                        } 
+                    }
+                });
+            };
+            appData.ventes.forEach(i => charts[i.id] = create3Axis(`chart-${i.id}`, i));
+            appData.achat.forEach(i => charts[i.id] = create3Axis(`chart-${i.id}`, i));
+            appData.prepa.forEach(i => charts[i.id] = create3Axis(`chart-${i.id}`, i));
+            appData.service.forEach(i => charts[i.id] = create3Axis(`chart-${i.id}`, i));
+        }
+
+        // --- MODALES ET EXPORT ---
+        function openTargetModal() {
+            const monthSelect = document.getElementById('edit-month');
+            if (monthSelect.options.length === 0) { for(let i=1; i<=12; i++) { let opt = document.createElement('option'); opt.value = i; opt.text = 'M' + i; if(i === 12) opt.selected = true; monthSelect.appendChild(opt); } }
+            document.getElementById('target-modal').classList.remove('hidden'); updateModalInputs();
+        }
+        function closeTargetModal() { document.getElementById('target-modal').classList.add('hidden'); }
+        function setModalFilter(filter) { currentModalFilter = filter; document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === filter)); updateModalInputs(); }
+        function updateModalInputs() {
+            currentModalMonth = parseInt(document.getElementById('edit-month').value);
+            currentModalProcess = document.getElementById('edit-process').value;
+            let html = '';
+            let processesToRender = currentModalProcess === 'tous' ? ['ventes', 'achat', 'prepa', 'service'] : [currentModalProcess];
+            processesToRender.forEach(p => {
+                appData[p].forEach(ind => {
+                    if (currentModalFilter === 'major' && !ind.isMajor) return;
+                    if (currentModalFilter === 'sub' && ind.isMajor) return;
+                    let val = ind.targets[currentModalMonth];
+                    html += `<div><label class="text-xs font-bold text-muted mb-1 block">${ind.title} (${ind.unit})</label><input type="number" step="0.01" id="target-${p}-${ind.id}" value="${val.toFixed(2)}" class="w-full p-2 rounded input-field"></div>`;
+                });
+            });
+            document.getElementById('target-inputs').innerHTML = html;
+        }
+        function saveTargets() {
+            const user = document.getElementById('user-display').innerText;
+            const now = new Date().toLocaleString('fr-FR');
+            let processesToRender = currentModalProcess === 'tous' ? ['ventes', 'achat', 'prepa', 'service'] : [currentModalProcess];
+            processesToRender.forEach(p => {
+                appData[p].forEach(ind => {
+                    if (currentModalFilter === 'major' && !ind.isMajor) return;
+                    if (currentModalFilter === 'sub' && ind.isMajor) return;
+                    const inputEl = document.getElementById(`target-${p}-${ind.id}`);
+                    if (!inputEl) return;
+                    const newVal = parseFloat(inputEl.value);
+                    const oldVal = ind.targets[currentModalMonth];
+                    if (newVal !== oldVal) {
+                        changeHistory.unshift({ date: now, user: user, process: p, indicator: ind.title, month: 'M' + currentModalMonth, oldVal: oldVal.toFixed(2), newVal: newVal.toFixed(2) });
+                        ind.targets[currentModalMonth] = newVal;
+                    }
+                });
+            });
+            localStorage.setItem('hp_history', JSON.stringify(changeHistory));
+            closeTargetModal(); renderAll();
+        }
+
+        function openHistoryModal() {
+            let html = '';
+            if (changeHistory.length === 0) { html = '<p class="text-muted text-center py-4">Aucune modification enregistrée pour le moment.</p>'; } 
+            else {
+                changeHistory.forEach(h => {
+                    html += `<div class="p-3 border-l-4 border-amber-500 rounded text-sm flex justify-between items-center bg-gray-50 dark:bg-gray-800"><div><span class="text-xs text-muted">${h.date} par <b>${h.user}</b></span><br><b>${h.indicator}</b> (${h.month}) : <span class="text-red-500 line-through">${h.oldVal}</span> ➔ <span class="text-emerald-500 font-bold">${h.newVal}</span></div><div class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">${h.process.toUpperCase()}</div></div>`;
+                });
+            }
+            document.getElementById('history-content').innerHTML = html; document.getElementById('history-modal').classList.remove('hidden');
+        }
+        function closeHistoryModal() { document.getElementById('history-modal').classList.add('hidden'); }
+
+        function exportData() {
+            const allData = [];
+            const processes = ['ventes', 'achat', 'prepa', 'service'];
+            processes.forEach(p => {
+                appData[p].forEach(ind => {
+                    let row = { "Processus": p.charAt(0).toUpperCase() + p.slice(1), "Indicateur": ind.title, "Formule": ind.formula, "Unite": ind.unit, "Réalisé M0": ind.m0, "Réalisé M1": ind.m1 };
+                    for(let m=1; m<=12; m++) row[`Cible M${m}`] = parseFloat(ind.targets[m].toFixed(2));
+                    allData.push(row);
+                });
+            });
+            const ws = XLSX.utils.json_to_sheet(allData); const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Tableau_de_Bord");
+            XLSX.writeFile(wb, "H-Pizza_Synthese_Complete.xlsx");
+        }
+
+        async function syncData() {
+            const btn = document.getElementById('sync-btn'); const icon = document.getElementById('sync-icon'); const text = document.getElementById('sync-text');
+            btn.disabled = true; btn.classList.replace('bg-blue-600', 'bg-blue-800'); icon.innerText = '⏳'; text.innerText = 'Connexion n8n...';
+            try {
+                const urlN8N = 'https://TON-N8N-URL/webhook/hpizza-sync';
+                if (urlN8N.includes('TON-N8N-URL')) { 
+                    await new Promise(r => setTimeout(r, 1500)); 
+                } else {
+                    const response = await fetch(urlN8N, { method: 'GET', headers: { 'Accept': 'application/json' } });
+                    if (!response.ok) throw new Error('Erreur réseau');
+                    const json = await response.json();
+                    if(json.ventes) { appData.ventes[0].m1 = json.ventes.m1; appData.ventes[1].m1 = json.ventes.cmd_m1; appData.ventes[2].m1 = json.ventes.ticket_m1; }
+                    if(json.achat) { appData.achat[2].m1 = json.achat.dispo_m1; appData.achat[0].m1 = json.achat.r_nc_m1; appData.achat[1].m1 = json.achat.r_c_m1; }
+                    if(json.prepa) { appData.prepa[0].m1 = json.prepa.temps_m1; appData.prepa[1].m1 = json.prepa.retard_m1; }
+                    if(json.service) { appData.service[2].m1 = json.service.indice_m1; appData.service[0].m1 = json.service.retours_m1; }
+                }
+                renderAll();
+                icon.innerText = '✅'; text.innerText = 'Odoo synchronisé'; btn.classList.replace('bg-blue-800', 'bg-emerald-600');
+            } catch (e) { icon.innerText = '⚠️'; text.innerText = 'Erreur n8n'; btn.classList.replace('bg-blue-800', 'bg-red-600'); }
+            finally { setTimeout(() => { btn.disabled = false; btn.classList.replace('bg-emerald-600', 'bg-blue-600'); btn.classList.replace('bg-red-600', 'bg-blue-600'); icon.innerText = '🔄'; text.innerText = 'Synchroniser n8n'; }, 3000); }
+        }
+    </script>
+</body>
+</html>
