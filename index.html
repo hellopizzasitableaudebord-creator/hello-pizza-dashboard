@@ -184,7 +184,6 @@
 
     <!-- ================= JAVASCRIPT ================= -->
     <script>
-        // --- DICTIONNAIRE COMPLET (FR, EN, AR) ---
         const i18n = {
             fr: {
                 app_title: "Hello Pizza Pilotage", app_subtitle: "Système d'Information & Tableau de Bord",
@@ -198,6 +197,7 @@
                 chart_month: "Mois", chart_monthly_val: "Valeur mensuelle", chart_cumul: "Cumul", chart_avg_cumul: "Moyenne cumulée", chart_target: "Cible mensuelle", chart_actual: "Réalisé",
                 target_m12: "Cible M12", actual_m1: "M1 (Réalisé)",
                 
+                v_ca_annual: "Chiffre d'Affaires Annuel",
                 v_ca_title: "Chiffre d'Affaires Mensuel", v_ca_formula: "(CA année en cours - CA année de référence)",
                 v_cmd_title: "Nombre de Commandes", v_cmd_formula: "Nb commandes mois m - Nb commandes mois référence",
                 v_ticket_title: "Ticket Moyen", v_ticket_formula: "Ticket moyen du mois actuel - Ticket moyen de référence",
@@ -224,6 +224,7 @@
                 chart_month: "Month", chart_monthly_val: "Monthly Value", chart_cumul: "Cumul", chart_avg_cumul: "Cumul Avg", chart_target: "Monthly Target", chart_actual: "Actual",
                 target_m12: "Target M12", actual_m1: "M1 (Actual)",
                 
+                v_ca_annual: "Annual Revenue",
                 v_ca_title: "Monthly Revenue", v_ca_formula: "(Current year revenue - Baseline year revenue)",
                 v_cmd_title: "Number of Orders", v_cmd_formula: "Orders month m - Baseline orders",
                 v_ticket_title: "Average Ticket", v_ticket_formula: "Current month ticket - Baseline ticket",
@@ -250,6 +251,7 @@
                 chart_month: "شهر", chart_monthly_val: "القيمة الشهرية", chart_cumul: "تراكمي", chart_avg_cumul: "متوسط تراكمي", chart_target: "الهدف الشهري", chart_actual: "الفعلي",
                 target_m12: "الهدف M12", actual_m1: "M1 (الفعلي)",
                 
+                v_ca_annual: "الإيرادات السنوية",
                 v_ca_title: "الإيرادات الشهرية", v_ca_formula: "(إيرادات السنة الحالية - إيرادات سنة الأساس)",
                 v_cmd_title: "عدد الطلبات", v_cmd_formula: "طلبات الشهر م - طلبات الأساس",
                 v_ticket_title: "متوسط الفاتورة", v_ticket_formula: "فاتورة الشهر الحالي - فاتورة الأساس",
@@ -304,7 +306,6 @@
 
         function generateTargets(m0, m12) { let arr = [m0]; for(let i=1; i<=12; i++) arr.push(m0 + (m12 - m0) * (i / 12)); return arr; }
 
-        // --- DONNÉES SANS TITRE NI FORMULE (GÉRÉS PAR i18n) ---
         const appData = {
             ventes: [
                 { id: 'v_ca', unit: 'DH', m0: 32940, m1: 22104, targets: generateTargets(32940, 44466), isReverse: false, isMajor: true },
@@ -385,11 +386,11 @@
                 }
             }
 
-            // 1. Gérant (4 Cartes + 4 Graphiques Majeurs)
+            // 1. Gérant (Titre Annuel pour CA)
             document.getElementById('content-gerant').innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <div class="card p-6 border-t-4 border-blue-500">
-                        <p class="text-xs font-bold text-muted uppercase">${t(appData.ventes[0].id + '_title')} (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${t('v_ca_annual')} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.ventes[0].m0.toLocaleString()} <span class="text-sm font-normal">DH</span></h3>
                         <p class="text-sm text-muted mt-2">${t('target_m12')} : ${appData.ventes[0].targets[12].toLocaleString()} DH</p>
                     </div>
@@ -412,7 +413,7 @@
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold">${t(appData.ventes[0].id + '_title')}</h3>
+                        <h3 class="text-lg font-bold">${t('v_ca_annual')}</h3>
                         <p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${appData.ventes[0].m1} ${appData.ventes[0].unit}</span> | ${t('target_m12')}: ${appData.ventes[0].targets[12].toFixed(2)} ${appData.ventes[0].unit}</p>
                         <div class="formula">${t(appData.ventes[0].id + '_formula')}</div>
                         <div class="chart-container"><canvas id="chart-gerant-v_ca"></canvas></div>
@@ -437,7 +438,7 @@
                     </div>
                 </div>`;
 
-            // 2. Processus
+            // 2. Processus (Titre Mensuel pour CA)
             const buildProcessHtml = (processKey) => {
                 let html = ''; appData[processKey].forEach(ind => {
                     html += `<div class="card p-6 mb-6"><h3 class="text-lg font-bold">${t(ind.id + '_title')}</h3><p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${ind.m1} ${ind.unit}</span> | ${t('target_m12')}: ${ind.targets[12].toFixed(2)} ${ind.unit}</p><div class="formula">${t(ind.id + '_formula')}</div><div class="chart-container"><canvas id="chart-${ind.id}"></canvas></div></div>`;
@@ -473,7 +474,7 @@
                             cumulated.push((ind.m0 + ind.m1).toFixed(2));
                         }
                     } else {
-                        cumulated.push(null); // S'arrête à M1
+                        cumulated.push(null);
                     }
                 }
 
