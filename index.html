@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr" class="dark" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>H-Pizza - Tableau de Bord</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (Excel) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
-        /* --- VARIABLES CSS POUR GERER LE THEME SOMBRE/CLAIR --- */
         :root {
             --bg-body: #f1f5f9; --text-main: #1e293b; --bg-card: #ffffff;
             --border-color: #e2e8f0; --text-muted: #64748b; --bg-input: #f8fafc;
@@ -35,50 +37,59 @@
         .filter-btn.active { background-color: #3b82f6 !important; color: white !important; border-color: #3b82f6 !important; }
 
         .formula { font-size: 0.75rem; padding: 0.5rem; border-radius: 0.25rem; margin-bottom: 1rem; border-left: 3px solid #3b82f6; background-color: var(--bg-input); color: var(--text-muted); font-style: italic; }
-        .chart-container { position: relative; height: 350px; width: 100%; }
-
-        .text-emerald-500, .text-emerald-600 { color: #10b981 !important; }
-        .text-blue-500, .text-blue-600 { color: #3b82f6 !important; }
-        .text-red-500, .text-red-600 { color: #ef4444 !important; }
-        .text-amber-500, .text-amber-600 { color: #f59e0b !important; }
+        html[dir="rtl"] .formula { border-left: none; border-right: 3px solid #3b82f6; }
+        .chart-container { position: relative; height: 320px; width: 100%; }
+        
+        .lang-btn { padding: 0.2rem 0.5rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.8rem; font-weight: bold; border: 1px solid var(--border-color); }
+        .lang-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
     </style>
 </head>
 <body class="p-4 md:p-8 font-sans">
 
     <!-- ================= CONNEXION ================= -->
-    <div id="login-screen" class="flex items-center justify-center h-screen">
+    <div id="login-screen" class="flex items-center justify-center h-screen relative">
+        
+        <!-- Boutons Thème & Langue (Haut Droite) -->
+        <div class="absolute top-6 right-6 flex gap-3 items-center">
+            <div class="flex gap-1 bg-gray-200 dark:bg-gray-800 p-1 rounded">
+                <button class="lang-btn active" onclick="changeLang('fr')">FR</button>
+                <button class="lang-btn" onclick="changeLang('en')">EN</button>
+                <button class="lang-btn" onclick="changeLang('ar')">AR</button>
+            </div>
+            <button onclick="toggleTheme()" class="p-2 rounded bg-gray-200 dark:bg-gray-800 text-xl border border-gray-300 dark:border-gray-600" title="Thème">🌓</button>
+        </div>
+
         <div class="card w-full max-w-md p-8 shadow-2xl">
-            <h1 class="text-3xl font-bold text-emerald-500 mb-2 text-center">H-Pizza Pilotage</h1>
-            <p class="text-muted mb-6 text-center text-sm">Système d'Information & Tableau de Bord</p>
+            <h1 class="text-3xl font-bold text-emerald-500 mb-2 text-center" data-i18n="app_title">H-Pizza Pilotage</h1>
+            <p class="text-muted mb-6 text-center text-sm" data-i18n="app_subtitle">Système d'Information & Tableau de Bord</p>
             
             <div class="flex justify-center mb-6 border-b border-gray-300 dark:border-gray-700">
-                <div id="tab-login" class="cursor-pointer px-4 py-2 border-b-2 border-emerald-500 text-emerald-500 font-bold" onclick="switchAuth('login')">Connexion</div>
-                <div id="tab-signup" class="cursor-pointer px-4 py-2 text-muted" onclick="switchAuth('signup')">Inscription</div>
+                <div id="tab-login" class="cursor-pointer px-4 py-2 border-b-2 border-emerald-500 text-emerald-500 font-bold" onclick="switchAuth('login')" data-i18n="tab_login">Connexion</div>
+                <div id="tab-signup" class="cursor-pointer px-4 py-2 text-muted" onclick="switchAuth('signup')" data-i18n="tab_signup">Inscription</div>
             </div>
 
             <form id="form-login" onsubmit="event.preventDefault(); login();">
-                <!-- CHAMP TYPE TEXT POUR PERMETTRE 'admin' SANS @ -->
-                <input type="text" id="login-email" name="email" autocomplete="username" placeholder="Email (ou admin)" class="w-full p-3 mb-3 rounded input-field focus:outline-none focus:border-emerald-500">
+                <input type="text" id="login-email" name="email" autocomplete="username" placeholder="Email (ou admin)" class="w-full p-3 mb-3 rounded input-field focus:outline-none focus:border-emerald-500" data-i18n-placeholder="ph_email">
                 <div class="relative mb-3">
-                    <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mot de passe (ou admin)" class="w-full p-3 pr-10 rounded input-field focus:outline-none focus:border-emerald-500">
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mot de passe" class="w-full p-3 pr-10 rounded input-field focus:outline-none focus:border-emerald-500" data-i18n-placeholder="ph_password">
                     <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none" title="Afficher/Masquer">👁️</button>
                 </div>
                 <div class="flex items-center mb-4">
                     <input type="checkbox" id="remember-me" class="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                    <label for="remember-me" class="ml-2 text-sm font-medium text-muted">Se souvenir de moi</label>
+                    <label for="remember-me" class="ml-2 text-sm font-medium text-muted" data-i18n="remember_me">Se souvenir de moi</label>
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded transition">Se connecter</button>
-                <p id="error-msg" class="text-red-500 text-sm mt-3 text-center hidden font-bold">Identifiants incorrects.</p>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded transition" data-i18n="btn_login">Se connecter</button>
+                <p id="error-msg" class="text-red-500 text-sm mt-3 text-center hidden font-bold" data-i18n="error_login">Identifiants incorrects.</p>
             </form>
 
             <form id="form-signup" class="hidden" onsubmit="event.preventDefault(); register();">
-                <input type="text" id="reg-name" name="name" autocomplete="name" placeholder="Nom complet" class="w-full p-3 mb-3 rounded input-field">
-                <input type="email" id="reg-email" name="email" autocomplete="email" placeholder="Email" class="w-full p-3 mb-3 rounded input-field">
+                <input type="text" id="reg-name" name="name" autocomplete="name" placeholder="Nom complet" class="w-full p-3 mb-3 rounded input-field" data-i18n-placeholder="ph_name">
+                <input type="email" id="reg-email" name="email" autocomplete="email" placeholder="Email" class="w-full p-3 mb-3 rounded input-field" data-i18n-placeholder="ph_email">
                 <div class="relative mb-4">
-                    <input type="password" id="reg-password" name="new-password" autocomplete="new-password" placeholder="Mot de passe" class="w-full p-3 pr-10 rounded input-field">
+                    <input type="password" id="reg-password" name="new-password" autocomplete="new-password" placeholder="Mot de passe" class="w-full p-3 pr-10 rounded input-field" data-i18n-placeholder="ph_password">
                     <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none">👁️</button>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition">S'inscrire</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition" data-i18n="btn_signup">S'inscrire</button>
             </form>
         </div>
     </div>
@@ -87,27 +98,36 @@
     <div id="dashboard-screen" class="hidden max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-gray-300 dark:border-gray-700 pb-4 gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-emerald-500">Hello Pizza — Tableau de Bord</h1>
-                <p class="text-sm text-muted">Connecté : <span id="user-display" class="font-bold"></span> | M0 = Sept. 2026</p>
+                <h1 class="text-2xl font-bold text-emerald-500" data-i18n="dash_title">Hello Pizza — Tableau de Bord</h1>
+                <p class="text-sm text-muted"><span data-i18n="connected_as">Connecté</span> : <span id="user-display" class="font-bold"></span> | M0 = Sept. 2026</p>
             </div>
             <div class="flex flex-wrap gap-2 items-center">
+                
+                <!-- Langue -->
+                <div class="flex gap-1 bg-gray-200 dark:bg-gray-800 p-1 rounded">
+                    <button class="lang-btn active" onclick="changeLang('fr')">FR</button>
+                    <button class="lang-btn" onclick="changeLang('en')">EN</button>
+                    <button class="lang-btn" onclick="changeLang('ar')">AR</button>
+                </div>
+
                 <button onclick="toggleTheme()" class="p-2 rounded bg-gray-200 dark:bg-gray-800 text-xl border border-gray-300 dark:border-gray-600" title="Thème">🌓</button>
-                <button onclick="exportData('xlsx')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold transition">📤 Exporter Excel</button>
+                
+                <button onclick="exportData('xlsx')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_export">📤 Exporter Excel</button>
                 <button onclick="syncData()" id="sync-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2 transition">
-                    <span id="sync-icon">🔄</span> <span id="sync-text">Synchroniser n8n</span>
+                    <span id="sync-icon">🔄</span> <span id="sync-text" data-i18n="btn_sync">Synchroniser</span>
                 </button>
-                <button onclick="openTargetModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded text-sm font-bold transition">⚙️ Cibles</button>
-                <button onclick="openHistoryModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-bold transition">📜 Historique</button>
-                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">Quitter</button>
+                <button onclick="openTargetModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_targets">⚙️ Cibles</button>
+                <button onclick="openHistoryModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-bold transition" data-i18n="btn_history">📜 Historique</button>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm" data-i18n="btn_logout">Quitter</button>
             </div>
         </header>
 
         <div class="flex flex-wrap gap-2 mb-6">
-            <button onclick="switchTab('gerant')" id="tab-gerant" class="px-4 py-2 rounded font-semibold tab-active transition">Synthèse Gérant</button>
-            <button onclick="switchTab('ventes')" id="tab-ventes" class="px-4 py-2 rounded font-semibold tab-inactive transition">Ventes</button>
-            <button onclick="switchTab('achat')" id="tab-achat" class="px-4 py-2 rounded font-semibold tab-inactive transition">Achat</button>
-            <button onclick="switchTab('prepa')" id="tab-prepa" class="px-4 py-2 rounded font-semibold tab-inactive transition">Préparation</button>
-            <button onclick="switchTab('service')" id="tab-service" class="px-4 py-2 rounded font-semibold tab-inactive transition">Service</button>
+            <button onclick="switchTab('gerant')" id="tab-gerant" class="px-4 py-2 rounded font-semibold tab-active transition" data-i18n="tab_manager">Synthèse Gérant</button>
+            <button onclick="switchTab('ventes')" id="tab-ventes" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_sales">Ventes</button>
+            <button onclick="switchTab('achat')" id="tab-achat" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_purchases">Achat</button>
+            <button onclick="switchTab('prepa')" id="tab-prepa" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_prep">Préparation</button>
+            <button onclick="switchTab('service')" id="tab-service" class="px-4 py-2 rounded font-semibold tab-inactive transition" data-i18n="tab_service">Service</button>
         </div>
 
         <div id="content-gerant" class="process-content space-y-6"></div>
@@ -120,35 +140,35 @@
     <!-- MODAL CIBLES -->
     <div id="target-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
         <div class="card w-full max-w-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-xl font-bold text-amber-500 mb-4">⚙️ Ajuster les Objectifs</h2>
+            <h2 class="text-xl font-bold text-amber-500 mb-4" data-i18n="modal_targets_title">⚙️ Ajuster les Objectifs</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-gray-100 dark:bg-gray-800 p-3 rounded">
                 <div>
-                    <label class="text-xs font-bold text-muted block mb-1">Processus</label>
+                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_process">Processus</label>
                     <select id="edit-process" class="w-full p-2 rounded border input-field font-bold" onchange="updateModalInputs()">
-                        <option value="tous">Tous</option>
-                        <option value="ventes">Ventes</option>
-                        <option value="achat">Achat</option>
-                        <option value="prepa">Préparation</option>
-                        <option value="service">Service</option>
+                        <option value="tous" data-i18n="opt_all">Tous</option>
+                        <option value="ventes" data-i18n="tab_sales">Ventes</option>
+                        <option value="achat" data-i18n="tab_purchases">Achat</option>
+                        <option value="prepa" data-i18n="tab_prep">Préparation</option>
+                        <option value="service" data-i18n="tab_service">Service</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-muted block mb-1">Mois</label>
+                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_month">Mois</label>
                     <select id="edit-month" class="w-full p-2 rounded border input-field font-bold" onchange="updateModalInputs()"></select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-muted block mb-1">Catégorie</label>
+                    <label class="text-xs font-bold text-muted block mb-1" data-i18n="lbl_category">Catégorie</label>
                     <div class="flex gap-1">
-                        <button class="filter-btn active flex-1" data-filter="all" onclick="setModalFilter('all')">Tous</button>
-                        <button class="filter-btn flex-1" data-filter="major" onclick="setModalFilter('major')">Majeurs</button>
-                        <button class="filter-btn flex-1" data-filter="sub" onclick="setModalFilter('sub')">Sous-obj.</button>
+                        <button class="filter-btn active flex-1" data-filter="all" onclick="setModalFilter('all')" data-i18n="opt_all">Tous</button>
+                        <button class="filter-btn flex-1" data-filter="major" onclick="setModalFilter('major')" data-i18n="opt_major">Majeurs</button>
+                        <button class="filter-btn flex-1" data-filter="sub" onclick="setModalFilter('sub')" data-i18n="opt_sub">Sous-obj.</button>
                     </div>
                 </div>
             </div>
             <div id="target-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
             <div class="flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
-                <button onclick="closeTargetModal()" class="px-4 py-2 text-muted font-bold hover:text-red-500">Annuler</button>
-                <button onclick="saveTargets()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded font-bold">Enregistrer</button>
+                <button onclick="closeTargetModal()" class="px-4 py-2 text-muted font-bold hover:text-red-500" data-i18n="btn_cancel">Annuler</button>
+                <button onclick="saveTargets()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded font-bold" data-i18n="btn_save">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -157,8 +177,8 @@
     <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
         <div class="card w-full max-w-3xl p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
             <div class="flex justify-between items-center mb-4 border-b border-gray-300 dark:border-gray-700 pb-2">
-                <h2 class="text-xl font-bold">📜 Historique des modifications</h2>
-                <button onclick="closeHistoryModal()" class="text-red-500 hover:text-red-700 font-bold bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded">Fermer</button>
+                <h2 class="text-xl font-bold" data-i18n="modal_history_title">📜 Historique des modifications</h2>
+                <button onclick="closeHistoryModal()" class="text-red-500 hover:text-red-700 font-bold bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded" data-i18n="btn_close">Fermer</button>
             </div>
             <div id="history-content" class="space-y-4"></div>
         </div>
@@ -166,6 +186,85 @@
 
     <!-- ================= JAVASCRIPT ================= -->
     <script>
+        // --- DICTIONNAIRE DE TRADUCTION ---
+        const i18n = {
+            fr: {
+                app_title: "H-Pizza Pilotage", app_subtitle: "Système d'Information & Tableau de Bord",
+                tab_login: "Connexion", tab_signup: "Inscription", ph_email: "Email (ou admin)", ph_password: "Mot de passe", ph_name: "Nom complet",
+                remember_me: "Se souvenir de moi", btn_login: "Se connecter", error_login: "Identifiants incorrects.", btn_signup: "S'inscrire",
+                dash_title: "Hello Pizza — Tableau de Bord", connected_as: "Connecté", btn_export: "📤 Exporter Excel", btn_sync: "Synchroniser",
+                btn_targets: "⚙️ Cibles", btn_history: "📜 Historique", btn_logout: "Quitter",
+                tab_manager: "Synthèse Gérant", tab_sales: "Ventes", tab_purchases: "Achat", tab_prep: "Préparation", tab_service: "Service",
+                modal_targets_title: "⚙️ Ajuster les Objectifs", lbl_process: "Processus", opt_all: "Tous", lbl_month: "Mois", lbl_category: "Catégorie",
+                opt_major: "Majeurs", opt_sub: "Sous-obj.", btn_cancel: "Annuler", btn_save: "Enregistrer", modal_history_title: "📜 Historique des modifications", btn_close: "Fermer",
+                // Chart labels
+                chart_month: "Mois", chart_monthly_val: "Valeur mensuelle", chart_cumul: "Cumul", chart_avg_cumul: "Moyenne cumulée", chart_target: "Cible mensuelle", chart_actual: "Réalisé"
+            },
+            en: {
+                app_title: "H-Pizza Dashboard", app_subtitle: "Information System & Dashboard",
+                tab_login: "Login", tab_signup: "Sign Up", ph_email: "Email (or admin)", ph_password: "Password", ph_name: "Full Name",
+                remember_me: "Remember me", btn_login: "Log In", error_login: "Invalid credentials.", btn_signup: "Sign Up",
+                dash_title: "Hello Pizza — Dashboard", connected_as: "Connected", btn_export: "📤 Export Excel", btn_sync: "Synchronize",
+                btn_targets: "⚙️ Targets", btn_history: "📜 History", btn_logout: "Log Out",
+                tab_manager: "Manager Summary", tab_sales: "Sales", tab_purchases: "Purchases", tab_prep: "Preparation", tab_service: "Service",
+                modal_targets_title: "⚙️ Adjust Targets", lbl_process: "Process", opt_all: "All", lbl_month: "Month", lbl_category: "Category",
+                opt_major: "Major", opt_sub: "Sub-obj.", btn_cancel: "Cancel", btn_save: "Save", modal_history_title: "📜 Modification History", btn_close: "Close",
+                // Chart labels
+                chart_month: "Month", chart_monthly_val: "Monthly Value", chart_cumul: "Cumul", chart_avg_cumul: "Cumul Avg", chart_target: "Monthly Target", chart_actual: "Actual"
+            },
+            ar: {
+                app_title: "إدارة بيتزا", app_subtitle: "نظام المعلومات ولوحة القيادة",
+                tab_login: "تسجيل الدخول", tab_signup: "إنشاء حساب", ph_email: "البريد (أو admin)", ph_password: "كلمة المرور", ph_name: "الاسم الكامل",
+                remember_me: "تذكرني", btn_login: "دخول", error_login: "بيانات غير صحيحة.", btn_signup: "تسجيل",
+                dash_title: "بيتزا — لوحة القيادة", connected_as: "متصل", btn_export: "📤 تصدير إكسيل", btn_sync: "مزامنة",
+                btn_targets: "⚙️ الأهداف", btn_history: "📜 السجل", btn_logout: "خروج",
+                tab_manager: "ملخص المدير", tab_sales: "المبيعات", tab_purchases: "المشتريات", tab_prep: "التحضير", tab_service: "الخدمة",
+                modal_targets_title: "⚙️ تعديل الأهداف", lbl_process: "العملية", opt_all: "الكل", lbl_month: "الشهر", lbl_category: "الفئة",
+                opt_major: "رئيسي", opt_sub: "فرعي", btn_cancel: "إلغاء", btn_save: "حفظ", modal_history_title: "📜 سجل التعديلات", btn_close: "إغلاق",
+                // Chart labels
+                chart_month: "شهر", chart_monthly_val: "القيمة الشهرية", chart_cumul: "تراكمي", chart_avg_cumul: "متوسط تراكمي", chart_target: "الهدف الشهري", chart_actual: "الفعلي"
+            }
+        };
+
+        let currentLang = 'fr';
+
+        function t(key) { return i18n[currentLang][key] || key; }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                el.innerText = t(el.getAttribute('data-i18n'));
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+            });
+        }
+
+        function changeLang(lang) {
+            currentLang = lang;
+            
+            // Update buttons active state
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if(btn.innerText.toLowerCase() === lang) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Gestion RTL pour l'arabe
+            if (lang === 'ar') {
+                document.documentElement.setAttribute('dir', 'rtl');
+                document.documentElement.setAttribute('lang', 'ar');
+            } else {
+                document.documentElement.setAttribute('dir', 'ltr');
+                document.documentElement.setAttribute('lang', lang);
+            }
+
+            applyTranslations();
+            
+            // Si on est sur le dashboard, on doit redessiner les graphiques pour mettre à jour les titres
+            if (!document.getElementById('dashboard-screen').classList.contains('hidden')) {
+                renderAll();
+            }
+        }
+
         function generateTargets(m0, m12) { let arr = [m0]; for(let i=1; i<=12; i++) arr.push(m0 + (m12 - m0) * (i / 12)); return arr; }
 
         const appData = {
@@ -224,7 +323,9 @@
             document.getElementById('dashboard-screen').classList.remove('hidden'); renderAll();
         }
         function logout() { location.reload(); }
-        function toggleTheme() { document.documentElement.classList.toggle('dark'); renderAll(); }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); 
+            if (!document.getElementById('dashboard-screen').classList.contains('hidden')) { renderAll(); } 
+        }
         function switchTab(tab) {
             document.querySelectorAll('.process-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('content-' + tab).classList.remove('hidden');
@@ -236,40 +337,66 @@
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#94a3b8' : '#475569';
             const gridColor = isDark ? '#334155' : '#e2e8f0';
+            
+            // Mise à jour dynamique du selecteur de mois dans le modal
+            const monthSelect = document.getElementById('edit-month');
+            if(monthSelect) {
+                monthSelect.innerHTML = '';
+                for(let i=1; i<=12; i++) {
+                    let opt = document.createElement('option'); opt.value = i; opt.text = 'M' + i;
+                    if(i === currentModalMonth) opt.selected = true; monthSelect.appendChild(opt);
+                }
+            }
 
-            // 1. Gérant (4 Cartes + Radar)
+            // 1. Gérant (4 Cartes + 4 Graphiques Majeurs avec noms exacts)
             document.getElementById('content-gerant').innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <div class="card p-6 border-t-4 border-blue-500">
-                        <p class="text-xs font-bold text-muted uppercase">Ventes (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${appData.ventes[0].title} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.ventes[0].m0.toLocaleString()} <span class="text-sm font-normal">DH</span></h3>
                         <p class="text-sm text-muted mt-2">Cible M12 : ${appData.ventes[0].targets[12].toLocaleString()} DH</p>
                     </div>
                     <div class="card p-6 border-t-4 border-emerald-500">
-                        <p class="text-xs font-bold text-muted uppercase">Achat (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${appData.achat[2].title} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.achat[2].m0} <span class="text-sm font-normal">%</span></h3>
                         <p class="text-sm text-muted mt-2">Cible M12 : ${appData.achat[2].targets[12].toFixed(1)} %</p>
                     </div>
                     <div class="card p-6 border-t-4 border-amber-500">
-                        <p class="text-xs font-bold text-muted uppercase">Préparation (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${appData.prepa[0].title} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.prepa[0].m0} <span class="text-sm font-normal">min</span></h3>
                         <p class="text-sm text-muted mt-2">Cible M12 : ${appData.prepa[0].targets[12].toFixed(1)} min</p>
                     </div>
                     <div class="card p-6 border-t-4 border-purple-500">
-                        <p class="text-xs font-bold text-muted uppercase">Service (M0)</p>
+                        <p class="text-xs font-bold text-muted uppercase">${appData.service[2].title} (M0)</p>
                         <h3 class="text-3xl font-bold mt-2">${appData.service[2].m0} <span class="text-sm font-normal">pts</span></h3>
                         <p class="text-sm text-muted mt-2">Cible M12 : ${appData.service[2].targets[12].toFixed(1)} pts</p>
                     </div>
                 </div>
                 
-                <div class="card p-6 mb-6">
-                    <h3 class="text-lg font-bold mb-2">Performance globale : Réalisé vs Cible M12</h3>
-                    <p class="text-sm text-muted mb-4">Ce radar compare le taux d'atteinte de nos objectifs. Plus le polygone s'étend vers l'extérieur, plus nous sommes proches de nos cibles.</p>
-                    <div class="flex justify-center" style="height: 350px;">
-                        <canvas id="chart-radar"></canvas>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold">${appData.ventes[0].title}</h3>
+                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.ventes[0].m1} ${appData.ventes[0].unit}</span> | Cible M12: ${appData.ventes[0].targets[12].toFixed(2)} ${appData.ventes[0].unit}</p>
+                        <div class="formula">${appData.ventes[0].formula}</div>
+                        <div class="chart-container"><canvas id="chart-gerant-v_ca"></canvas></div>
                     </div>
-                    <div class="mt-4 text-sm text-muted bg-gray-50 dark:bg-gray-800 p-3 rounded">
-                        <strong>Lecture :</strong> À M0, nous sommes déjà à 94% de l'objectif sur l'Achat (ce qui est excellent) et à 91% sur le Service. Le plus grand défi reste le Chiffre d'Affaires (74%) et le Temps de Préparation (75%), sur lesquels nous devons concentrer nos efforts.
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold">${appData.achat[2].title}</h3>
+                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.achat[2].m1} ${appData.achat[2].unit}</span> | Cible M12: ${appData.achat[2].targets[12].toFixed(2)} ${appData.achat[2].unit}</p>
+                        <div class="formula">${appData.achat[2].formula}</div>
+                        <div class="chart-container"><canvas id="chart-gerant-a_stock"></canvas></div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold">${appData.prepa[0].title}</h3>
+                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.prepa[0].m1} ${appData.prepa[0].unit}</span> | Cible M12: ${appData.prepa[0].targets[12].toFixed(2)} ${appData.prepa[0].unit}</p>
+                        <div class="formula">${appData.prepa[0].formula}</div>
+                        <div class="chart-container"><canvas id="chart-gerant-p_temps"></canvas></div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold">${appData.service[2].title}</h3>
+                        <p class="text-sm text-muted mb-2">M1 (Réalisé): <span class="font-bold text-emerald-500">${appData.service[2].m1} ${appData.service[2].unit}</span> | Cible M12: ${appData.service[2].targets[12].toFixed(2)} ${appData.service[2].unit}</p>
+                        <div class="formula">${appData.service[2].formula}</div>
+                        <div class="chart-container"><canvas id="chart-gerant-s_indice"></canvas></div>
                     </div>
                 </div>`;
 
@@ -287,65 +414,62 @@
             // 3. Charts
             Object.values(charts).forEach(c => c.destroy()); charts = {};
 
-            // --- RADAR CONFORME (0-120%) ---
-            const ctxRadar = document.getElementById('chart-radar').getContext('2d');
-            
-            // Calcul des pourcentages d'atteinte
-            const pctVentesM0 = (appData.ventes[0].m0 / appData.ventes[0].targets[12]) * 100;
-            const pctVentesM1 = (appData.ventes[0].m1 / appData.ventes[0].targets[12]) * 100;
-            const pctAchatM0 = (appData.achat[2].m0 / appData.achat[2].targets[12]) * 100;
-            const pctAchatM1 = (appData.achat[2].m1 / appData.achat[2].targets[12]) * 100;
-            const pctPrepaM0 = (appData.prepa[0].targets[12] / appData.prepa[0].m0) * 100;
-            const pctPrepaM1 = (appData.prepa[0].targets[12] / appData.prepa[0].m1) * 100;
-            const pctServiceM0 = (appData.service[2].m0 / appData.service[2].targets[12]) * 100;
-            const pctServiceM1 = (appData.service[2].m1 / appData.service[2].targets[12]) * 100;
-
-            charts.radar = new Chart(ctxRadar, {
-                type: 'radar',
-                data: { 
-                    labels: ['Ventes (CA)', 'Achat (Dispo)', 'Préparation (Temps)', 'Service (Indice)'], 
-                    datasets: [
-                        { label: 'Réalisé M0', data: [pctVentesM0, pctAchatM0, pctPrepaM0, pctServiceM0], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', pointBackgroundColor: '#10b981' },
-                        { label: 'Réalisé M1', data: [pctVentesM1, pctAchatM1, pctPrepaM1, pctServiceM1], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.05)', pointBackgroundColor: '#f59e0b', borderDash: [5, 5] },
-                        { label: 'Cible M12 (100%)', data: [100, 100, 100, 100], borderColor: '#3b82f6', borderWidth: 2, backgroundColor: 'transparent' }
-                    ]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: textColor } } }, 
-                    scales: { r: { grid: { color: gridColor }, angleLines: { color: gridColor }, pointLabels: { color: textColor, font: { size: 12, weight: 'bold' } }, ticks: { display: false }, suggestedMin: 0, suggestedMax: 120 } } 
-                }
-            });
-
-            // --- GRAPHIQUES 3 AXES ---
             const create3Axis = (canvasId, ind) => {
                 const ctx = document.getElementById(canvasId).getContext('2d');
                 let realised = [], cumulated = [];
-                let cumul = ind.m0;
+                
+                let cumulCA = 0, cumulCmd = 0, cumulCAProj = 0, cumulCmdProj = 0;
+
                 for (let i = 0; i <= 12; i++) {
-                    if (i === 0) { realised.push(ind.m0); cumulated.push(ind.m0); }
-                    else if (i === 1) { realised.push(ind.m1); cumul += ind.m1; cumulated.push((cumul / 2).toFixed(2)); }
-                    else { realised.push(null); cumulated.push(null); }
+                    if (i === 0) { realised.push(ind.m0); }
+                    else if (i === 1) { realised.push(ind.m1); }
+                    else { realised.push(null); }
+
+                    if (ind.id === 'v_ticket') {
+                        if (i === 0) { cumulCA = appData.ventes[0].m0; cumulCmd = appData.ventes[1].m0; cumulated.push(ind.m0); }
+                        else if (i === 1) { cumulCA += appData.ventes[0].m1; cumulCmd += appData.ventes[1].m1; cumulated.push((cumulCA / cumulCmd).toFixed(2)); }
+                        else {
+                            cumulCAProj = cumulCA + appData.ventes[0].targets.slice(1, i+1).reduce((a,b)=>a+b, 0);
+                            cumulCmdProj = cumulCmd + appData.ventes[1].targets.slice(1, i+1).reduce((a,b)=>a+b, 0);
+                            cumulated.push((cumulCAProj / cumulCmdProj).toFixed(2));
+                        }
+                    } else if (ind.isReverse) {
+                        let cumul = ind.m0;
+                        if (i === 0) { cumulated.push(ind.m0); }
+                        else if (i === 1) { cumul += ind.m1; cumulated.push((cumul / 2).toFixed(2)); }
+                        else { cumul += ind.targets[i]; cumulated.push((cumul / (i + 1)).toFixed(2)); }
+                    } else {
+                        let cumul = ind.m0;
+                        if (i === 0) { cumulated.push(ind.m0); }
+                        else if (i === 1) { cumul += ind.m1; cumulated.push(cumul.toFixed(2)); }
+                        else { cumul += ind.targets[i]; cumulated.push(cumul.toFixed(2)); }
+                    }
                 }
+
                 return new Chart(ctx, {
                     type: 'bar',
                     data: { labels: ['M0','M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'], datasets: [
-                        { type: 'bar', label: 'Réalisé', data: realised, backgroundColor: '#10b981', yAxisID: 'y', order: 3 },
-                        { type: 'bar', label: 'Cible mensuelle', data: ind.targets, backgroundColor: '#3b82f6', yAxisID: 'y', order: 2 },
-                        // LIGNE PLEINE POUR LE CUMUL
-                        { type: 'line', label: ind.isReverse ? 'Moyenne cumulée' : 'Cumulé', data: cumulated, borderColor: '#f97316', backgroundColor: '#f97316', pointBackgroundColor: '#fff', pointBorderColor: '#f97316', yAxisID: 'y1', order: 1, borderWidth: 2 }
+                        { type: 'bar', label: t('chart_actual'), data: realised, backgroundColor: '#10b981', yAxisID: 'y', order: 3 },
+                        { type: 'bar', label: t('chart_target'), data: ind.targets, backgroundColor: '#3b82f6', yAxisID: 'y', order: 2 },
+                        { type: 'line', label: ind.isReverse ? t('chart_avg_cumul') : (ind.id === 'v_ticket' ? 'Ticket moyen cumulé' : t('chart_cumul')), data: cumulated, borderColor: '#f97316', backgroundColor: '#f97316', pointBackgroundColor: '#fff', pointBorderColor: '#f97316', yAxisID: 'y1', order: 1, borderWidth: 2 }
                     ]},
                     options: { 
                         responsive: true, maintainAspectRatio: false, 
                         plugins: { legend: { labels: { color: textColor } } }, 
                         scales: { 
-                            x: { title: { display: true, text: 'Mois', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, 
-                            y: { position: 'left', title: { display: true, text: `Valeur mensuelle (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { color: gridColor }, grace: '20%' }, 
-                            y1: { position: 'right', title: { display: true, text: ind.isReverse ? `Moyenne cumulée (${ind.unit})` : `Cumulé (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false }, grace: '20%' } 
+                            x: { title: { display: true, text: t('chart_month'), color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, 
+                            y: { position: 'left', title: { display: true, text: `${t('chart_monthly_val')} (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { color: gridColor }, grace: '20%' }, 
+                            y1: { position: 'right', title: { display: true, text: ind.isReverse ? `${t('chart_avg_cumul')} (${ind.unit})` : (ind.id === 'v_ticket' ? 'Ticket moyen cumulé (DH)' : `${t('chart_cumul')} (${ind.unit})`), color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false }, grace: '20%' } 
                         } 
                     }
                 });
             };
+
+            charts['gerant-v_ca'] = create3Axis('chart-gerant-v_ca', appData.ventes[0]);
+            charts['gerant-a_stock'] = create3Axis('chart-gerant-a_stock', appData.achat[2]);
+            charts['gerant-p_temps'] = create3Axis('chart-gerant-p_temps', appData.prepa[0]);
+            charts['gerant-s_indice'] = create3Axis('chart-gerant-s_indice', appData.service[2]);
+
             appData.ventes.forEach(i => charts[i.id] = create3Axis(`chart-${i.id}`, i));
             appData.achat.forEach(i => charts[i.id] = create3Axis(`chart-${i.id}`, i));
             appData.prepa.forEach(i => charts[i.id] = create3Axis(`chart-${i.id}`, i));
@@ -354,8 +478,6 @@
 
         // --- MODALES ET EXPORT ---
         function openTargetModal() {
-            const monthSelect = document.getElementById('edit-month');
-            if (monthSelect.options.length === 0) { for(let i=1; i<=12; i++) { let opt = document.createElement('option'); opt.value = i; opt.text = 'M' + i; if(i === 12) opt.selected = true; monthSelect.appendChild(opt); } }
             document.getElementById('target-modal').classList.remove('hidden'); updateModalInputs();
         }
         function closeTargetModal() { document.getElementById('target-modal').classList.add('hidden'); }
@@ -377,7 +499,7 @@
         }
         function saveTargets() {
             const user = document.getElementById('user-display').innerText;
-            const now = new Date().toLocaleString('fr-FR');
+            const now = new Date().toLocaleString();
             let processesToRender = currentModalProcess === 'tous' ? ['ventes', 'achat', 'prepa', 'service'] : [currentModalProcess];
             processesToRender.forEach(p => {
                 appData[p].forEach(ind => {
@@ -399,7 +521,7 @@
 
         function openHistoryModal() {
             let html = '';
-            if (changeHistory.length === 0) { html = '<p class="text-muted text-center py-4">Aucune modification enregistrée pour le moment.</p>'; } 
+            if (changeHistory.length === 0) { html = '<p class="text-muted text-center py-4">Aucune modification enregistrée.</p>'; } 
             else {
                 changeHistory.forEach(h => {
                     html += `<div class="p-3 border-l-4 border-amber-500 rounded text-sm flex justify-between items-center bg-gray-50 dark:bg-gray-800"><div><span class="text-xs text-muted">${h.date} par <b>${h.user}</b></span><br><b>${h.indicator}</b> (${h.month}) : <span class="text-red-500 line-through">${h.oldVal}</span> ➔ <span class="text-emerald-500 font-bold">${h.newVal}</span></div><div class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">${h.process.toUpperCase()}</div></div>`;
@@ -414,7 +536,7 @@
             const processes = ['ventes', 'achat', 'prepa', 'service'];
             processes.forEach(p => {
                 appData[p].forEach(ind => {
-                    let row = { "Processus": p.charAt(0).toUpperCase() + p.slice(1), "Indicateur": ind.title, "Formule": ind.formula, "Unite": ind.unit, "Réalisé M0": ind.m0, "Réalisé M1": ind.m1 };
+                    let row = { "Processus": p, "Indicateur": ind.title, "Formule": ind.formula, "Unite": ind.unit, "Réalisé M0": ind.m0, "Réalisé M1": ind.m1 };
                     for(let m=1; m<=12; m++) row[`Cible M${m}`] = parseFloat(ind.targets[m].toFixed(2));
                     allData.push(row);
                 });
@@ -426,7 +548,7 @@
 
         async function syncData() {
             const btn = document.getElementById('sync-btn'); const icon = document.getElementById('sync-icon'); const text = document.getElementById('sync-text');
-            btn.disabled = true; btn.classList.replace('bg-blue-600', 'bg-blue-800'); icon.innerText = '⏳'; text.innerText = 'Connexion n8n...';
+            btn.disabled = true; btn.classList.replace('bg-blue-600', 'bg-blue-800'); icon.innerText = '⏳'; text.innerText = t('btn_sync') + '...';
             try {
                 const urlN8N = 'https://TON-N8N-URL/webhook/hpizza-sync';
                 if (urlN8N.includes('TON-N8N-URL')) { 
@@ -441,10 +563,13 @@
                     if(json.service) { appData.service[2].m1 = json.service.indice_m1; appData.service[0].m1 = json.service.retours_m1; }
                 }
                 renderAll();
-                icon.innerText = '✅'; text.innerText = 'Odoo synchronisé'; btn.classList.replace('bg-blue-800', 'bg-emerald-600');
-            } catch (e) { icon.innerText = '⚠️'; text.innerText = 'Erreur n8n'; btn.classList.replace('bg-blue-800', 'bg-red-600'); }
-            finally { setTimeout(() => { btn.disabled = false; btn.classList.replace('bg-emerald-600', 'bg-blue-600'); btn.classList.replace('bg-red-600', 'bg-blue-600'); icon.innerText = '🔄'; text.innerText = 'Synchroniser n8n'; }, 3000); }
+                icon.innerText = '✅'; text.innerText = 'OK'; btn.classList.replace('bg-blue-800', 'bg-emerald-600');
+            } catch (e) { icon.innerText = '⚠️'; text.innerText = 'Erreur'; btn.classList.replace('bg-blue-800', 'bg-red-600'); }
+            finally { setTimeout(() => { btn.disabled = false; btn.classList.replace('bg-emerald-600', 'bg-blue-600'); btn.classList.replace('bg-red-600', 'bg-blue-600'); icon.innerText = '🔄'; text.innerText = t('btn_sync'); }, 3000); }
         }
+        
+        // Initialisation au chargement
+        applyTranslations();
     </script>
 </body>
 </html>
