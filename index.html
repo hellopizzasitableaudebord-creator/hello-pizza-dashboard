@@ -184,6 +184,7 @@
 
     <!-- ================= JAVASCRIPT ================= -->
     <script>
+        // --- DICTIONNAIRE COMPLET ---
         const i18n = {
             fr: {
                 app_title: "Hello Pizza Pilotage", app_subtitle: "Système d'Information & Tableau de Bord",
@@ -306,25 +307,26 @@
 
         function generateTargets(m0, m12) { let arr = [m0]; for(let i=1; i<=12; i++) arr.push(m0 + (m12 - m0) * (i / 12)); return arr; }
 
+        // --- CORRECTION : AJOUT DE cumulType POUR DÉFINIR LA LOGIQUE DE CHAQUE INDICATEUR ---
         const appData = {
             ventes: [
-                { id: 'v_ca', unit: 'DH', m0: 32940, m1: 22104, targets: generateTargets(32940, 44466), isReverse: false, isMajor: true },
-                { id: 'v_cmd', unit: 'cmd', m0: 540, m1: 359, targets: generateTargets(540, 648), isReverse: false, isMajor: false },
-                { id: 'v_ticket', unit: 'DH', m0: 61.00, m1: 61.57, targets: generateTargets(61, 68.62), isReverse: false, isMajor: false }
+                { id: 'v_ca', unit: 'DH', m0: 32940, m1: 22104, targets: generateTargets(32940, 44466), isReverse: false, isMajor: true, cumulType: 'sum' },
+                { id: 'v_cmd', unit: 'cmd', m0: 540, m1: 359, targets: generateTargets(540, 648), isReverse: false, isMajor: false, cumulType: 'sum' },
+                { id: 'v_ticket', unit: 'DH', m0: 61.00, m1: 61.57, targets: generateTargets(61, 68.62), isReverse: false, isMajor: false, cumulType: 'weighted' }
             ],
             achat: [
-                { id: 'a_rupt_nc', unit: '%', m0: 8.93, m1: 8.93, targets: generateTargets(8.93, 3.57), isReverse: true, isMajor: false },
-                { id: 'a_rupt_c', unit: '%', m0: 16.6, m1: 16.6, targets: generateTargets(16.6, 0), isReverse: true, isMajor: false },
-                { id: 'a_stock', unit: '%', m0: 89.71, m1: 89.71, targets: generateTargets(89.71, 95), isReverse: false, isMajor: true }
+                { id: 'a_rupt_nc', unit: '%', m0: 8.93, m1: 8.93, targets: generateTargets(8.93, 3.57), isReverse: true, isMajor: false, cumulType: 'average' },
+                { id: 'a_rupt_c', unit: '%', m0: 16.6, m1: 16.6, targets: generateTargets(16.6, 0), isReverse: true, isMajor: false, cumulType: 'average' },
+                { id: 'a_stock', unit: '%', m0: 89.71, m1: 89.71, targets: generateTargets(89.71, 95), isReverse: false, isMajor: true, cumulType: 'average' }
             ],
             prepa: [
-                { id: 'p_temps', unit: 'min', m0: 20, m1: 20, targets: generateTargets(20, 15), isReverse: true, isMajor: true },
-                { id: 'p_retard', unit: '%', m0: 10.0, m1: 9.0, targets: generateTargets(10, 5), isReverse: true, isMajor: false }
+                { id: 'p_temps', unit: 'min', m0: 20, m1: 20, targets: generateTargets(20, 15), isReverse: true, isMajor: true, cumulType: 'average' },
+                { id: 'p_retard', unit: '%', m0: 10.0, m1: 9.0, targets: generateTargets(10, 5), isReverse: true, isMajor: false, cumulType: 'average' }
             ],
             service: [
-                { id: 's_retours', unit: 'retours', m0: 15, m1: 26, targets: generateTargets(15, 30), isReverse: false, isMajor: false },
-                { id: 's_reclam', unit: '%', m0: 5.0, m1: 4.5, targets: generateTargets(5, 3), isReverse: true, isMajor: false },
-                { id: 's_indice', unit: 'pts', m0: 72.5, m1: 73.5, targets: generateTargets(72.5, 82.5), isReverse: false, isMajor: true }
+                { id: 's_retours', unit: 'retours', m0: 15, m1: 26, targets: generateTargets(15, 30), isReverse: false, isMajor: false, cumulType: 'sum' },
+                { id: 's_reclam', unit: '%', m0: 5.0, m1: 4.5, targets: generateTargets(5, 3), isReverse: true, isMajor: false, cumulType: 'average' },
+                { id: 's_indice', unit: 'pts', m0: 72.5, m1: 73.5, targets: generateTargets(72.5, 82.5), isReverse: false, isMajor: true, cumulType: 'average' }
             ]
         };
 
@@ -386,7 +388,7 @@
                 }
             }
 
-            // 1. Gérant (Titre Annuel pour CA)
+            // 1. Gérant
             document.getElementById('content-gerant').innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <div class="card p-6 border-t-4 border-blue-500">
@@ -438,7 +440,7 @@
                     </div>
                 </div>`;
 
-            // 2. Processus (Titre Mensuel pour CA)
+            // 2. Processus
             const buildProcessHtml = (processKey) => {
                 let html = ''; appData[processKey].forEach(ind => {
                     html += `<div class="card p-6 mb-6"><h3 class="text-lg font-bold">${t(ind.id + '_title')}</h3><p class="text-sm text-muted mb-2">${t('actual_m1')}: <span class="font-bold text-emerald-500">${ind.m1} ${ind.unit}</span> | ${t('target_m12')}: ${ind.targets[12].toFixed(2)} ${ind.unit}</p><div class="formula">${t(ind.id + '_formula')}</div><div class="chart-container"><canvas id="chart-${ind.id}"></canvas></div></div>`;
@@ -464,11 +466,11 @@
                     if (i === 0) {
                         cumulated.push(ind.m0);
                     } else if (i === 1) {
-                        if (ind.id === 'v_ticket') {
+                        if (ind.cumulType === 'weighted') {
                             const caTotal = appData.ventes[0].m0 + appData.ventes[0].m1;
                             const cmdTotal = appData.ventes[1].m0 + appData.ventes[1].m1;
                             cumulated.push((caTotal / cmdTotal).toFixed(2));
-                        } else if (ind.isReverse) {
+                        } else if (ind.cumulType === 'average') {
                             cumulated.push(((ind.m0 + ind.m1) / 2).toFixed(2));
                         } else {
                             cumulated.push((ind.m0 + ind.m1).toFixed(2));
@@ -478,12 +480,17 @@
                     }
                 }
 
+                // Choix du libellé du cumul selon le type
+                let cumulLabel = t('chart_cumul');
+                if (ind.cumulType === 'average') cumulLabel = t('chart_avg_cumul');
+                if (ind.cumulType === 'weighted') cumulLabel = t('ticket_cumul');
+
                 return new Chart(ctx, {
                     type: 'bar',
                     data: { labels: ['M0','M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'], datasets: [
                         { type: 'bar', label: t('chart_actual'), data: realised, backgroundColor: '#10b981', yAxisID: 'y', order: 3 },
                         { type: 'bar', label: t('chart_target'), data: ind.targets, backgroundColor: '#3b82f6', yAxisID: 'y', order: 2 },
-                        { type: 'line', label: ind.isReverse ? t('chart_avg_cumul') : (ind.id === 'v_ticket' ? t('ticket_cumul') : t('chart_cumul')), data: cumulated, borderColor: '#f97316', backgroundColor: '#f97316', pointBackgroundColor: '#fff', pointBorderColor: '#f97316', yAxisID: 'y1', order: 1, borderWidth: 2, spanGaps: false }
+                        { type: 'line', label: cumulLabel, data: cumulated, borderColor: '#f97316', backgroundColor: '#f97316', pointBackgroundColor: '#fff', pointBorderColor: '#f97316', yAxisID: 'y1', order: 1, borderWidth: 2, spanGaps: false }
                     ]},
                     options: { 
                         responsive: true, maintainAspectRatio: false, 
@@ -491,7 +498,7 @@
                         scales: { 
                             x: { title: { display: true, text: t('chart_month'), color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, 
                             y: { position: 'left', title: { display: true, text: `${t('chart_monthly_val')} (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { color: gridColor }, grace: '20%' }, 
-                            y1: { position: 'right', title: { display: true, text: ind.isReverse ? `${t('chart_avg_cumul')} (${ind.unit})` : (ind.id === 'v_ticket' ? `${t('ticket_cumul')} (DH)` : `${t('chart_cumul')} (${ind.unit})`), color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false }, grace: '20%' } 
+                            y1: { position: 'right', title: { display: true, text: `${cumulLabel} (${ind.unit})`, color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false }, grace: '20%' } 
                         } 
                     }
                 });
